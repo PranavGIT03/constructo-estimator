@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>Construction Cost Estimator</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Create New Estimate</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="materialsList"></div>
+                        <button class="btn btn-success" onclick="addMaterial()">Add Material</button>
+                        <hr>
+                        <button class="btn btn-primary" onclick="calculateEstimate()">Calculate Estimate</button>
+                        <div id="estimateResult" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>My Estimates</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="myEstimates"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let materials = [];
+let selectedMaterials = [];
+
+// Load materials on page load
+window.onload = async () => {
+    await loadMaterials();
+    await loadMyEstimates();
+};
+
+async function loadMaterials() {
+    try {
+        const response = await fetch('/api/materials');
+        materials = await response.json();
+    } catch (error) {
+        console.error('Failed to load materials:', error);
+    }
+}
+
+function addMaterial() {
+    const div = document.createElement('div');
+    div.className = 'row mb-2';
+    div.innerHTML = `
+        <div class="col-md-6">
+            <select class="form-select material-select">
+                <option value="">Select Material</option>
+                ${materials.map(m => `<option value="${m.id}">${m.name} (${m.category}) - ₹${m.price}/${m.unit}</option>`).join('')}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="number" class="form-control quantity-input" placeholder="Quantity" min="1">
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-danger btn-sm" onclick="this.parentElement.parentElement.remove()">Remove</button>
+        </div>
+    `;
+    document.getElementById('materialsList').appendChild(div);
+}
+
+async function calculateEstimate() {
+    const materialRows = document.querySelectorAll('#materialsList .row');
+    const estimateData = [];
+    
+    materialRows.forEach(row => {
+        const materialId = row.querySelector('.material-select').value;
+        const quantity = parseFloat(row.querySelector('.quantity-input').value);
+        
+        if (materialId && quantity) {
+            estimateData.push({
+                material_id: parseInt(materialId),
+                quantity: quantity
+            });
+        }
+    });
+    
+    if (estimateData.length === 0) {
+        alert('Please add at least one material');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/estimate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({materials: estimateData})
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            document.getElementById('estimateResult').innerHTML = `
+                <div class="alert alert-success">
+                    <h6>Estimate Created Successfully!</h6>
+                    <p><strong>Total Cost: ₹${result.total_cost.toFixed(2)}</strong></p>
+                    <p>Estimations Left: ${result.estimations_left}</p>
+                </div>
+            `;
+            loadMyEstimates();
+        } else {
+            document.getElementById('estimateResult').innerHTML = `
+                <div class="alert alert-danger">${result.error}</div>
+            `;
+        }
+    } catch (error) {
+        document.getElementById('estimateResult').innerHTML = `
+            <div class="alert alert-danger">Failed to create estimate</div>
+        `;
+    }
+}
+
+async function loadMyEstimates() {
+    try {
+        const response = await fetch('/api/my-estimates');
+        const estimates = await response.json();
+        
+        const html = estimates.map(est => `
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h6>₹${est.total_cost.toFixed(2)}</h6>
+                    <small class="text-muted">${new Date(est.created_at).toLocaleDateString()}</small>
+                    <div class="mt-2">
+                        ${est.details.map(d => `<small>${d.material}: ${d.quantity} × ₹${d.unit_price} = ₹${d.total}</small>`).join('<br>')}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        document.getElementById('myEstimates').innerHTML = html || '<p>No estimates yet</p>';
+    } catch (error) {
+        console.error('Failed to load estimates:', error);
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2>Construction Cost Estimator</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div id="categories-container"></div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Selected Items</h5>
+                </div>
+                <div class="card-body">
+                    <div id="selected-items"></div>
+                    <hr>
+                    <h4>Total Estimated Cost: ₹<span id="total-cost">0</span></h4>
+                    <button class="btn btn-success mt-3" onclick="saveEstimate()">Save Estimate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="message" class="mt-3"></div>
+</div>
+
+<script>
+let categories = {};
+let selectedItems = [];
+let totalCost = 0;
+
+window.onload = loadCategories;
+
+async function loadCategories() {
+    try {
+        const response = await fetch('/api/categories');
+        categories = await response.json();
+        renderCategories();
+    } catch (error) {
+        showMessage('Failed to load categories', 'danger');
+    }
+}
+
+function renderCategories() {
+    const container = document.getElementById('categories-container');
+    let html = '';
+    
+    Object.keys(categories).forEach(category => {
+        html += `
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h4>${category}</h4>
+                </div>
+                <div class="card-body">
+        `;
+        
+        Object.keys(categories[category]).forEach(subcategory => {
+            html += `
+                <div class="mb-3">
+                    <h6>${subcategory}</h6>
+                    <div class="row">
+            `;
+            
+            categories[category][subcategory].forEach(item => {
+                const displayName = item.brand ? `${item.name} (${item.brand})` : item.name;
+                html += `
+                    <div class="col-md-6 mb-2">
+                        <div class="border p-2">
+                            <strong>${displayName}</strong><br>
+                            ₹${item.price}/${item.unit}<br>
+                            <div class="input-group mt-2">
+                                <input type="number" class="form-control" id="qty-${item.id}" placeholder="Quantity" min="0" step="0.1">
+                                <button class="btn btn-primary" onclick="addItem('${item.id}')">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function addItem(itemId) {
+    const qtyInput = document.getElementById(`qty-${itemId}`);
+    const quantity = parseFloat(qtyInput.value);
+    
+    if (!quantity || quantity <= 0) {
+        alert('Please enter a valid quantity');
+        return;
+    }
+    
+    // Find the item in categories
+    let foundItem = null;
+    Object.keys(categories).forEach(category => {
+        Object.keys(categories[category]).forEach(subcategory => {
+            categories[category][subcategory].forEach(item => {
+                if (item.id === itemId) {
+                    foundItem = {
+                        ...item,
+                        category,
+                        subcategory,
+                        quantity
+                    };
+                }
+            });
+        });
+    });
+    
+    if (foundItem) {
+        // Check if item already exists
+        const existingIndex = selectedItems.findIndex(item => item.id === itemId);
+        if (existingIndex >= 0) {
+            selectedItems[existingIndex].quantity += quantity;
+        } else {
+            selectedItems.push(foundItem);
+        }
+        
+        qtyInput.value = '';
+        updateSelectedItems();
+    }
+}
+
+function updateSelectedItems() {
+    const container = document.getElementById('selected-items');
+    totalCost = 0;
+    
+    if (selectedItems.length === 0) {
+        container.innerHTML = '<p>No items selected</p>';
+        document.getElementById('total-cost').textContent = '0';
+        return;
+    }
+    
+    let html = '';
+    selectedItems.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        totalCost += itemTotal;
+        
+        const displayName = item.brand ? `${item.name} (${item.brand})` : item.name;
+        html += `
+            <div class="border-bottom pb-2 mb-2">
+                <strong>${displayName}</strong><br>
+                <small>${item.category} > ${item.subcategory}</small><br>
+                ${item.quantity} ${item.unit} × ₹${item.price} = ₹${itemTotal}<br>
+                <button class="btn btn-sm btn-danger" onclick="removeItem(${index})">Remove</button>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    document.getElementById('total-cost').textContent = totalCost.toFixed(2);
+}
+
+function removeItem(index) {
+    selectedItems.splice(index, 1);
+    updateSelectedItems();
+}
+
+async function saveEstimate() {
+    if (selectedItems.length === 0) {
+        alert('Please select some items first');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/estimate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({items: selectedItems})
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            showMessage(`Estimate saved! Total: ₹${result.total_cost}. Estimates left: ${result.estimations_left}`, 'success');
+            selectedItems = [];
+            updateSelectedItems();
+        } else {
+            showMessage(result.error, 'danger');
+        }
+    } catch (error) {
+        showMessage('Failed to save estimate', 'danger');
+    }
+}
+
+function showMessage(text, type) {
+    document.getElementById('message').innerHTML = 
+        `<div class="alert alert-${type}">${text}</div>`;
+    setTimeout(() => {
+        document.getElementById('message').innerHTML = '';
+    }, 5000);
+}
+</script>
+{% endblock %}

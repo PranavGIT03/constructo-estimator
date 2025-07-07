@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2>Admin Excel Dashboard</h2>
+    
+    <div class="mb-3">
+        <button class="btn btn-success" onclick="addRow()">Add Row</button>
+        <button class="btn btn-primary" onclick="saveData()">Save Changes</button>
+        <button class="btn btn-info" onclick="loadData()">Refresh</button>
+    </div>
+    
+    <div id="message"></div>
+    
+    <div class="table-responsive">
+        <table id="dataTable" class="table table-bordered">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+let tableData = [];
+let columns = [];
+
+window.onload = loadData;
+
+async function loadData() {
+    try {
+        const response = await fetch('/api/admin/excel-data');
+        const result = await response.json();
+        
+        if (response.ok) {
+            columns = result.columns;
+            tableData = result.data;
+            renderTable();
+            showMessage('Data loaded successfully', 'success');
+        } else {
+            showMessage('Error: ' + result.error, 'danger');
+        }
+    } catch (error) {
+        showMessage('Failed to load data: ' + error.message, 'danger');
+    }
+}
+
+function renderTable() {
+    const thead = document.getElementById('tableHead');
+    const tbody = document.getElementById('tableBody');
+    
+    thead.innerHTML = '';
+    tbody.innerHTML = '';
+    
+    if (columns.length === 0) {
+        tbody.innerHTML = '<tr><td>No data available</td></tr>';
+        return;
+    }
+    
+    // Header
+    const headerRow = document.createElement('tr');
+    columns.forEach(col => {
+        const th = document.createElement('th');
+        th.textContent = col;
+        headerRow.appendChild(th);
+    });
+    const actionTh = document.createElement('th');
+    actionTh.textContent = 'Actions';
+    headerRow.appendChild(actionTh);
+    thead.appendChild(headerRow);
+    
+    // Data rows
+    tableData.forEach((row, rowIndex) => {
+        const tr = document.createElement('tr');
+        
+        columns.forEach(col => {
+            const td = document.createElement('td');
+            const input = document.createElement('input');
+            input.className = 'form-control';
+            input.value = row[col] || '';
+            input.onchange = () => {
+                tableData[rowIndex][col] = input.value;
+            };
+            td.appendChild(input);
+            tr.appendChild(td);
+        });
+        
+        // Actions
+        const actionTd = document.createElement('td');
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-danger btn-sm';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => deleteRow(rowIndex);
+        actionTd.appendChild(deleteBtn);
+        tr.appendChild(actionTd);
+        
+        tbody.appendChild(tr);
+    });
+}
+
+function addRow() {
+    const newRow = {};
+    columns.forEach(col => newRow[col] = '');
+    tableData.push(newRow);
+    renderTable();
+}
+
+function deleteRow(index) {
+    if (confirm('Delete this row?')) {
+        tableData.splice(index, 1);
+        renderTable();
+    }
+}
+
+async function saveData() {
+    try {
+        const response = await fetch('/api/admin/excel-update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({data: tableData})
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            showMessage('Data saved successfully!', 'success');
+        } else {
+            showMessage('Error: ' + result.error, 'danger');
+        }
+    } catch (error) {
+        showMessage('Failed to save: ' + error.message, 'danger');
+    }
+}
+
+function showMessage(text, type) {
+    document.getElementById('message').innerHTML = 
+        `<div class="alert alert-${type}">${text}</div>`;
+    setTimeout(() => {
+        document.getElementById('message').innerHTML = '';
+    }, 3000);
+}
+</script>
+{% endblock %}

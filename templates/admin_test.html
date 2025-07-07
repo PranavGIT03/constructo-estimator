@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Test</title>
+</head>
+<body>
+    <h1>Admin Dashboard Test</h1>
+    <p>If you can see this, the admin route is working!</p>
+    <p>Current user: {{ current_user.email }}</p>
+    
+    <div>
+        <h3>Test Excel API</h3>
+        <button onclick="testAPI()">Test Excel Data API</button>
+        <div id="result"></div>
+    </div>
+    
+    <script>
+    async function testAPI() {
+        try {
+            const response = await fetch('/api/admin/excel-data');
+            const data = await response.json();
+            document.getElementById('result').innerHTML = 
+                '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        } catch (error) {
+            document.getElementById('result').innerHTML = 
+                '<p style="color:red;">Error: ' + error.message + '</p>';
+        }
+    }
+    </script>
+</body>
+</html>

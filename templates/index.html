@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1 class="display-4">Welcome to Constructo</h1>
+        <p class="lead">Professional Construction Cost Estimation Platform</p>
+        
+        <div class="mt-4">
+            <a href="/login" class="btn btn-primary btn-lg me-3">Login</a>
+            <a href="/register" class="btn btn-outline-primary btn-lg">Register</a>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <h5>Material Database</h5>
+                <p>Comprehensive database of construction materials with current pricing</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Cost Estimation</h5>
+                <p>Generate accurate cost estimates for your construction projects</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Multiple Plans</h5>
+                <p>Free and premium subscription options to fit your needs</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
