@@ -179,5 +179,47 @@ def create_estimate():
 def dashboard():
     return render_template('dashboard_new.html')
 
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    if current_user.email != 'admin@example.com':
+        return redirect(url_for('index'))
+    return render_template('admin_firebase.html')
+
+@app.route('/api/admin/materials', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@login_required
+def admin_materials():
+    if current_user.email != 'admin@example.com':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    try:
+        if request.method == 'GET':
+            materials = []
+            docs = db.collection('materials').stream()
+            for doc in docs:
+                data = doc.to_dict()
+                data['id'] = doc.id
+                materials.append(data)
+            return jsonify(materials)
+        
+        elif request.method == 'POST':
+            data = request.get_json()
+            doc_ref = db.collection('materials').add(data)
+            return jsonify({'success': True, 'id': doc_ref[1].id})
+        
+        elif request.method == 'PUT':
+            data = request.get_json()
+            material_id = data.pop('id')
+            db.collection('materials').document(material_id).update(data)
+            return jsonify({'success': True})
+        
+        elif request.method == 'DELETE':
+            material_id = request.args.get('id')
+            db.collection('materials').document(material_id).delete()
+            return jsonify({'success': True})
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5003)
