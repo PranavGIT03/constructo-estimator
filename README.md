@@ -1,20 +1,25 @@
 # Constructo - Construction Cost Estimator
 
-A Flask-based web application for construction cost estimation with material database and user management.
+A Flask-based web application for construction cost estimation designed for individuals building homes on small plots (under 1500 sq ft) with budgets between ₹1 Cr and ₹1.5 Cr.
 
 ## Features
 
 - User registration and authentication
-- Material database with categories (RCC, Electrical, Plumbing)
-- Cost estimation calculator
+- Material database with categories and quality tiers (Eco+, Standard, Premium)
+- Detailed cost estimation calculator
+- Sample house plans based on plot dimensions
+- Detailed BOQ and product selection
+- Construction guides and articles
 - Subscription-based usage limits
-- Admin panel for data management
+- Comprehensive admin panel for data management
 - Responsive web interface
 
 ## Quick Start
 
 1. Install dependencies:
 ```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -24,25 +29,29 @@ python run.py
 ```
 
 3. Open your browser and visit:
-   - Main app: http://localhost:5000
-   - Admin panel: http://localhost:5000/admin
+   - Main app: http://localhost:5001
+   - Admin panel: http://localhost:5001/admin
 
-## API Endpoints
+## Main Sections
 
-- `POST /register` - User registration
-- `POST /login` - User login
-- `GET /api/materials` - Get all materials
-- `POST /api/estimate` - Create cost estimate
-- `GET /api/my-estimates` - Get user's estimates
-
-## Usage
-
-1. Register a new account (gets 3 free estimates)
-2. Login to access the dashboard
-3. Select materials and quantities
-4. Calculate cost estimates
-5. View estimation history
+1. **Create Estimate** - Generate detailed cost estimates based on your building requirements
+2. **Sample Plan Selector** - Browse and download sample house plans that match your plot dimensions
+3. **Detailed BOQ + Product Selector** - Explore detailed bill of quantities and select specific products
+4. **Guide to Building a Home** - Access educational content about home construction
 
 ## Admin Access
 
-Use email: admin@example.com to access admin panel (create this user first).
+Use the following credentials to access the admin panel:
+- Email: admin@example.com
+- Password: admin123
+
+The admin panel allows you to manage:
+- Materials and products
+- Sample plans
+- Educational articles
+- User accounts
+
+## Subscription Plans
+
+- **Free Plan**: 3 basic estimates, limited sample plans
+- **Premium Plan**: Unlimited estimates, detailed cost breakdowns, all sample plans, product customization, expert tips

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Admin Dashboard</h2>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">Materials</h5>
+                <p class="card-text">Manage construction materials, prices, and details</p>
+                <a href="/admin/materials" class="btn btn-primary">Manage Materials</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">Sample Plans</h5>
+                <p class="card-text">Upload and manage sample house plans</p>
+                <a href="/admin/sample-plans" class="btn btn-primary">Manage Plans</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">Articles</h5>
+                <p class="card-text">Create and edit construction guide articles</p>
+                <a href="/admin/articles" class="btn btn-primary">Manage Articles</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">Users</h5>
+                <p class="card-text">Manage user accounts and subscriptions</p>
+                <a href="/admin/users" class="btn btn-primary">Manage Users</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Estimates</h5>
+            </div>
+            <div class="card-body">
+                <div id="recentEstimates">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>User Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div id="userStats">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load recent estimates
+    fetch('/api/admin/recent-estimates')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('recentEstimates');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<p>No recent estimates found.</p>';
+                return;
+            }
+            
+            let html = '<div class="list-group">';
+            
+            data.forEach(estimate => {
+                html += `
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">₹${estimate.total_cost.toLocaleString('en-IN')}</h6>
+                            <small>${new Date(estimate.created_at).toLocaleDateString()}</small>
+                        </div>
+                        <p class="mb-1">User: ${estimate.user_email}</p>
+                        <small>Built-up Area: ${estimate.built_up_area} sq ft, Floors: ${estimate.floors}</small>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error loading recent estimates:', error);
+            document.getElementById('recentEstimates').innerHTML = '<p>Error loading recent estimates.</p>';
+        });
+    
+    // Load user statistics
+    fetch('/api/admin/user-stats')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('userStats');
+            
+            let html = `
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h2>${data.total_users}</h2>
+                        <p>Total Users</p>
+                    </div>
+                    <div class="col-6">
+                        <h2>${data.premium_users}</h2>
+                        <p>Premium Users</p>
+                    </div>
+                </div>
+                <div class="row text-center mt-3">
+                    <div class="col-6">
+                        <h2>${data.total_estimates}</h2>
+                        <p>Total Estimates</p>
+                    </div>
+                    <div class="col-6">
+                        <h2>${data.new_users_today}</h2>
+                        <p>New Users Today</p>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error loading user statistics:', error);
+            document.getElementById('userStats').innerHTML = '<p>Error loading user statistics.</p>';
+        });
+});
+</script>
+{% endblock %}

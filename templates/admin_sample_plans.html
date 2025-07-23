@@ -1,0 +1,464 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Manage Sample Plans</h2>
+
+<div class="mb-3">
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addPlanModal">Add New Plan</button>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search plans...">
+            </div>
+            <div class="col-md-3">
+                <select id="floorsFilter" class="form-select">
+                    <option value="">All Floors</option>
+                    <option value="1">Ground only</option>
+                    <option value="2">G+1</option>
+                    <option value="3">G+2</option>
+                    <option value="4">G+3</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="sizeFilter" class="form-select">
+                    <option value="">All Sizes</option>
+                    <option value="small">Small (< 500 sq ft)</option>
+                    <option value="medium">Medium (500-1000 sq ft)</option>
+                    <option value="large">Large (> 1000 sq ft)</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button id="refreshBtn" class="btn btn-info w-100">Refresh</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row" id="plansContainer">
+            <div class="col-12 text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Plan Modal -->
+<div class="modal fade" id="addPlanModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Sample Plan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPlanForm">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Plan Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="min_width" class="form-label">Min Width (feet)</label>
+                                <input type="number" class="form-control" id="min_width" name="min_width" min="15" max="60" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="max_width" class="form-label">Max Width (feet)</label>
+                                <input type="number" class="form-control" id="max_width" name="max_width" min="15" max="60" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="min_length" class="form-label">Min Length (feet)</label>
+                                <input type="number" class="form-control" id="min_length" name="min_length" min="20" max="60" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="max_length" class="form-label">Max Length (feet)</label>
+                                <input type="number" class="form-control" id="max_length" name="max_length" min="20" max="60" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="floors" class="form-label">Number of Floors</label>
+                                <select class="form-select" id="floors" name="floors" required>
+                                    <option value="1">Ground only</option>
+                                    <option value="2">G+1</option>
+                                    <option value="3">G+2</option>
+                                    <option value="4">G+3</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="file_path" class="form-label">File Path</label>
+                                <input type="text" class="form-control" id="file_path" name="file_path" required>
+                                <small class="form-text text-muted">In a real app, this would be a file upload field</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="thumbnail_path" class="form-label">Thumbnail Path</label>
+                                <input type="text" class="form-control" id="thumbnail_path" name="thumbnail_path" required>
+                                <small class="form-text text-muted">In a real app, this would be a file upload field</small>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveNewPlanBtn">Save Plan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Plan Modal -->
+<div class="modal fade" id="editPlanModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Sample Plan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPlanForm">
+                    <input type="hidden" id="edit_id" name="id">
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="edit_name" class="form-label">Plan Name</label>
+                                <input type="text" class="form-control" id="edit_name" name="name" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_min_width" class="form-label">Min Width (feet)</label>
+                                <input type="number" class="form-control" id="edit_min_width" name="min_width" min="15" max="60" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_max_width" class="form-label">Max Width (feet)</label>
+                                <input type="number" class="form-control" id="edit_max_width" name="max_width" min="15" max="60" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_min_length" class="form-label">Min Length (feet)</label>
+                                <input type="number" class="form-control" id="edit_min_length" name="min_length" min="20" max="60" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_max_length" class="form-label">Max Length (feet)</label>
+                                <input type="number" class="form-control" id="edit_max_length" name="max_length" min="20" max="60" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_floors" class="form-label">Number of Floors</label>
+                                <select class="form-select" id="edit_floors" name="floors" required>
+                                    <option value="1">Ground only</option>
+                                    <option value="2">G+1</option>
+                                    <option value="3">G+2</option>
+                                    <option value="4">G+3</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_file_path" class="form-label">File Path</label>
+                                <input type="text" class="form-control" id="edit_file_path" name="file_path" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_thumbnail_path" class="form-label">Thumbnail Path</label>
+                                <input type="text" class="form-control" id="edit_thumbnail_path" name="thumbnail_path" required>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="deletePlanBtn">Delete</button>
+                <button type="button" class="btn btn-primary" id="updatePlanBtn">Update Plan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let plans = [];
+    
+    // Load plans on page load
+    loadPlans();
+    
+    // Event listeners
+    document.getElementById('refreshBtn').addEventListener('click', loadPlans);
+    document.getElementById('searchInput').addEventListener('input', filterPlans);
+    document.getElementById('floorsFilter').addEventListener('change', filterPlans);
+    document.getElementById('sizeFilter').addEventListener('change', filterPlans);
+    
+    document.getElementById('saveNewPlanBtn').addEventListener('click', savePlan);
+    document.getElementById('updatePlanBtn').addEventListener('click', updatePlan);
+    document.getElementById('deletePlanBtn').addEventListener('click', deletePlan);
+    
+    async function loadPlans() {
+        try {
+            const response = await fetch('/api/admin/sample-plans');
+            plans = await response.json();
+            
+            // Display plans
+            displayPlans(plans);
+        } catch (error) {
+            console.error('Error loading plans:', error);
+            alert('Failed to load plans. Please try again.');
+        }
+    }
+    
+    function displayPlans(plansToDisplay) {
+        const container = document.getElementById('plansContainer');
+        
+        if (plansToDisplay.length === 0) {
+            container.innerHTML = '<div class="col-12 text-center"><p>No plans found</p></div>';
+            return;
+        }
+        
+        let html = '';
+        
+        plansToDisplay.forEach(plan => {
+            html += `
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="${plan.thumbnail_path || '/static/placeholder.jpg'}" class="card-img-top" alt="${plan.name}">
+                        <div class="card-body">
+                            <h5 class="card-title">${plan.name}</h5>
+                            <p class="card-text">
+                                Size: ${plan.min_width}' x ${plan.min_length}' to ${plan.max_width}' x ${plan.max_length}'<br>
+                                Floors: ${plan.floors === 1 ? 'Ground only' : 'G+' + (plan.floors - 1)}
+                            </p>
+                            <button class="btn btn-primary edit-btn" data-id="${plan.id}">Edit</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        
+        // Add event listeners to edit buttons
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const planId = this.getAttribute('data-id');
+                openEditModal(planId);
+            });
+        });
+    }
+    
+    function filterPlans() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const floorsFilter = document.getElementById('floorsFilter').value;
+        const sizeFilter = document.getElementById('sizeFilter').value;
+        
+        const filteredPlans = plans.filter(plan => {
+            const matchesSearch = plan.name.toLowerCase().includes(searchTerm);
+            const matchesFloors = !floorsFilter || plan.floors == floorsFilter;
+            
+            let matchesSize = true;
+            if (sizeFilter) {
+                const area = plan.max_width * plan.max_length;
+                if (sizeFilter === 'small' && area >= 500) matchesSize = false;
+                if (sizeFilter === 'medium' && (area < 500 || area > 1000)) matchesSize = false;
+                if (sizeFilter === 'large' && area <= 1000) matchesSize = false;
+            }
+            
+            return matchesSearch && matchesFloors && matchesSize;
+        });
+        
+        displayPlans(filteredPlans);
+    }
+    
+    async function savePlan() {
+        const form = document.getElementById('addPlanForm');
+        
+        const planData = {
+            name: document.getElementById('name').value,
+            min_width: parseFloat(document.getElementById('min_width').value),
+            max_width: parseFloat(document.getElementById('max_width').value),
+            min_length: parseFloat(document.getElementById('min_length').value),
+            max_length: parseFloat(document.getElementById('max_length').value),
+            floors: parseInt(document.getElementById('floors').value),
+            file_path: document.getElementById('file_path').value,
+            thumbnail_path: document.getElementById('thumbnail_path').value
+        };
+        
+        try {
+            const response = await fetch('/api/admin/sample-plan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(planData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Sample plan added successfully!');
+                form.reset();
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addPlanModal'));
+                modal.hide();
+                
+                // Reload plans
+                loadPlans();
+            } else {
+                alert('Error: ' + (result.error || 'Failed to add sample plan'));
+            }
+        } catch (error) {
+            console.error('Error adding sample plan:', error);
+            alert('Failed to add sample plan. Please try again.');
+        }
+    }
+    
+    function openEditModal(planId) {
+        const plan = plans.find(p => p.id == planId);
+        
+        if (!plan) {
+            alert('Plan not found');
+            return;
+        }
+        
+        // Populate form fields
+        document.getElementById('edit_id').value = plan.id;
+        document.getElementById('edit_name').value = plan.name;
+        document.getElementById('edit_min_width').value = plan.min_width;
+        document.getElementById('edit_max_width').value = plan.max_width;
+        document.getElementById('edit_min_length').value = plan.min_length;
+        document.getElementById('edit_max_length').value = plan.max_length;
+        document.getElementById('edit_floors').value = plan.floors;
+        document.getElementById('edit_file_path').value = plan.file_path;
+        document.getElementById('edit_thumbnail_path').value = plan.thumbnail_path;
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('editPlanModal'));
+        modal.show();
+    }
+    
+    async function updatePlan() {
+        const planId = document.getElementById('edit_id').value;
+        
+        const planData = {
+            name: document.getElementById('edit_name').value,
+            min_width: parseFloat(document.getElementById('edit_min_width').value),
+            max_width: parseFloat(document.getElementById('edit_max_width').value),
+            min_length: parseFloat(document.getElementById('edit_min_length').value),
+            max_length: parseFloat(document.getElementById('edit_max_length').value),
+            floors: parseInt(document.getElementById('edit_floors').value),
+            file_path: document.getElementById('edit_file_path').value,
+            thumbnail_path: document.getElementById('edit_thumbnail_path').value
+        };
+        
+        try {
+            const response = await fetch(`/api/admin/sample-plan/${planId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(planData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Sample plan updated successfully!');
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editPlanModal'));
+                modal.hide();
+                
+                // Reload plans
+                loadPlans();
+            } else {
+                alert('Error: ' + (result.error || 'Failed to update sample plan'));
+            }
+        } catch (error) {
+            console.error('Error updating sample plan:', error);
+            alert('Failed to update sample plan. Please try again.');
+        }
+    }
+    
+    async function deletePlan() {
+        if (!confirm('Are you sure you want to delete this sample plan?')) {
+            return;
+        }
+        
+        const planId = document.getElementById('edit_id').value;
+        
+        try {
+            const response = await fetch(`/api/admin/sample-plan/${planId}`, {
+                method: 'DELETE'
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Sample plan deleted successfully!');
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editPlanModal'));
+                modal.hide();
+                
+                // Reload plans
+                loadPlans();
+            } else {
+                alert('Error: ' + (result.error || 'Failed to delete sample plan'));
+            }
+        } catch (error) {
+            console.error('Error deleting sample plan:', error);
+            alert('Failed to delete sample plan. Please try again.');
+        }
+    }
+});
+</script>
+{% endblock %}

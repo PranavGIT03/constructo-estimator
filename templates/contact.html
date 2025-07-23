@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Contact Us</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Get in Touch</h5>
+                <form id="contactForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Your Name</label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <select class="form-select" id="subject" required>
+                            <option value="">Select a subject</option>
+                            <option value="General Inquiry">General Inquiry</option>
+                            <option value="Technical Support">Technical Support</option>
+                            <option value="Subscription Question">Subscription Question</option>
+                            <option value="Feedback">Feedback</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" rows="5" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+                
+                <div id="formResponse" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Contact Information</h5>
+                <p><i class="bi bi-envelope"></i> Email: support@constructo.com</p>
+                <p><i class="bi bi-telephone"></i> Phone: +91 98765 43210</p>
+                <p><i class="bi bi-clock"></i> Hours: Monday to Friday, 9:00 AM - 6:00 PM</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Frequently Asked Questions</h5>
+                <p>Have questions? Check our <a href="/faqs">FAQ page</a> for quick answers to common questions.</p>
+                <p>If you can't find what you're looking for, feel free to contact us using the form.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
+    const formResponse = document.getElementById('formResponse');
+    
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // In a real app, this would send the form data to the server
+        // For now, just show a success message
+        formResponse.innerHTML = `
+            <div class="alert alert-success">
+                Thank you for your message! We will get back to you soon.
+            </div>
+        `;
+        
+        // Reset the form
+        contactForm.reset();
+        
+        // Hide the success message after 5 seconds
+        setTimeout(() => {
+            formResponse.innerHTML = '';
+        }, 5000);
+    });
+});
+</script>
+{% endblock %}

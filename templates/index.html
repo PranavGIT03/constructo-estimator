@@ -1,30 +1,64 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="quote-container text-center mb-4">
+    <h2 class="display-6">Design your dream home with clarity</h2>
+    <p class="lead">Plan smart, build smarter</p>
+</div>
+
+{% if not current_user.is_authenticated %}
+<div class="text-center mb-4">
+    <a href="/login" class="btn btn-primary btn-lg me-3">Log In</a>
+    <a href="/register" class="btn btn-outline-primary btn-lg">Register</a>
+</div>
+{% endif %}
+
 <div class="row">
-    <div class="col-md-8 mx-auto text-center">
-        <h1 class="display-4">Welcome to Constructo</h1>
-        <p class="lead">Professional Construction Cost Estimation Platform</p>
-        
-        <div class="mt-4">
-            <a href="/login" class="btn btn-primary btn-lg me-3">Login</a>
-            <a href="/register" class="btn btn-outline-primary btn-lg">Register</a>
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="category-box text-center h-100">
+            <h3>Create Estimate</h3>
+            <p>Generate a detailed cost estimate for your dream home based on your requirements</p>
+            <a href="/create-estimate" class="btn btn-primary">Start</a>
         </div>
-        
-        <div class="row mt-5">
-            <div class="col-md-4">
-                <h5>Material Database</h5>
-                <p>Comprehensive database of construction materials with current pricing</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Cost Estimation</h5>
-                <p>Generate accurate cost estimates for your construction projects</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Multiple Plans</h5>
-                <p>Free and premium subscription options to fit your needs</p>
-            </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="category-box text-center h-100">
+            <h3>Sample Plan Selector</h3>
+            <p>Browse and download sample house plans that match your plot dimensions</p>
+            <a href="/sample-plans" class="btn btn-primary">Browse</a>
         </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="category-box text-center h-100">
+            <h3>Detailed BOQ + Product Selector</h3>
+            <p>Explore detailed bill of quantities and select specific products for your home</p>
+            <a href="/detailed-boq" class="btn btn-primary">Explore</a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="category-box text-center h-100">
+            <h3>Guide to Building a Home</h3>
+            <p>Learn about construction stages, budget management, and common mistakes to avoid</p>
+            <a href="/guides" class="btn btn-primary">Learn</a>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <h5>For Tier-2 & Tier-3 City Homeowners</h5>
+        <p>Designed specifically for individuals building homes on plots under 1500 sqft with budgets between ₹1 Cr and ₹1.5 Cr</p>
+    </div>
+    <div class="col-md-4">
+        <h5>Complete Construction Guidance</h5>
+        <p>From layout planning to financial planning, product selection, and design options within your budget</p>
+    </div>
+    <div class="col-md-4">
+        <h5>Avoid Common Mistakes</h5>
+        <p>Get tips and tricks to make informed decisions and avoid costly errors during construction</p>
     </div>
 </div>
 {% endblock %}

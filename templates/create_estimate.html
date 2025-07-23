@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Create Estimate</h2>
+
+<div class="progress-container">
+    <div class="progress">
+        <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+    </div>
+    <p class="text-center mt-2" id="progress-text">0 of 12 inputs completed</p>
+</div>
+
+<form id="estimateForm">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="plot_area" class="form-label">Plot Area (sq ft)</label>
+                <input type="number" class="form-control" id="plot_area" name="plot_area" min="100" max="1500" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="built_up_area" class="form-label">Built Up Area (sq ft)</label>
+                <input type="number" class="form-control" id="built_up_area" name="built_up_area" min="100" max="1500" required>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="floors" class="form-label">Number of Floors</label>
+                <select class="form-select" id="floors" name="floors" required>
+                    <option value="1">Ground only</option>
+                    <option value="2">G+1</option>
+                    <option value="3">G+2</option>
+                    <option value="4">G+3</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="dining_rooms" class="form-label">Number of Dining Rooms</label>
+                <input type="number" class="form-control" id="dining_rooms" name="dining_rooms" min="0" max="3" value="1">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="drawing_rooms" class="form-label">Number of Drawing Rooms</label>
+                <input type="number" class="form-control" id="drawing_rooms" name="drawing_rooms" min="0" max="3" value="1">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="lounges" class="form-label">Number of Lounges</label>
+                <input type="number" class="form-control" id="lounges" name="lounges" min="0" max="3" value="0">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="bedrooms" class="form-label">Number of Bedrooms</label>
+                <input type="number" class="form-control" id="bedrooms" name="bedrooms" min="1" max="10" value="2" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="bathrooms" class="form-label">Number of Bathrooms</label>
+                <input type="number" class="form-control" id="bathrooms" name="bathrooms" min="1" max="10" value="2" required>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="kitchens" class="form-label">Number of Kitchens</label>
+                <input type="number" class="form-control" id="kitchens" name="kitchens" min="1" max="3" value="1" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="utility_rooms" class="form-label">Number of Utility/Store Rooms</label>
+                <input type="number" class="form-control" id="utility_rooms" name="utility_rooms" min="0" max="5" value="1">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="car_parking" class="form-label">Number of Car Parking Spaces</label>
+                <input type="number" class="form-control" id="car_parking" name="car_parking" min="0" max="5" value="1">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="two_wheeler_parking" class="form-label">Number of Two-Wheeler Parking Spaces</label>
+                <input type="number" class="form-control" id="two_wheeler_parking" name="two_wheeler_parking" min="0" max="5" value="1">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="lift" name="lift">
+                <label class="form-check-label" for="lift">Include Lift</label>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Generate Estimate</button>
+</form>
+
+<div id="estimateResult" class="mt-4"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('estimateForm');
+    const inputs = form.querySelectorAll('input, select');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    
+    // Update progress when inputs change
+    inputs.forEach(input => {
+        input.addEventListener('change', updateProgress);
+    });
+    
+    // Initial progress update
+    updateProgress();
+    
+    // Form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = {
+            plot_area: parseFloat(document.getElementById('plot_area').value),
+            built_up_area: parseFloat(document.getElementById('built_up_area').value),
+            floors: parseInt(document.getElementById('floors').value),
+            dining_rooms: parseInt(document.getElementById('dining_rooms').value),
+            drawing_rooms: parseInt(document.getElementById('drawing_rooms').value),
+            lounges: parseInt(document.getElementById('lounges').value),
+            bedrooms: parseInt(document.getElementById('bedrooms').value),
+            bathrooms: parseInt(document.getElementById('bathrooms').value),
+            kitchens: parseInt(document.getElementById('kitchens').value),
+            utility_rooms: parseInt(document.getElementById('utility_rooms').value),
+            car_parking: parseInt(document.getElementById('car_parking').value),
+            two_wheeler_parking: parseInt(document.getElementById('two_wheeler_parking').value),
+            lift: document.getElementById('lift').checked
+        };
+        
+        try {
+            const response = await fetch('/api/estimate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                displayEstimate(result);
+            } else {
+                document.getElementById('estimateResult').innerHTML = `
+                    <div class="alert alert-danger">
+                        ${result.error || 'An error occurred while generating the estimate.'}
+                    </div>
+                `;
+            }
+        } catch (error) {
+            document.getElementById('estimateResult').innerHTML = `
+                <div class="alert alert-danger">
+                    An error occurred while generating the estimate.
+                </div>
+            `;
+        }
+    });
+    
+    function updateProgress() {
+        let completed = 0;
+        const total = inputs.length;
+        
+        inputs.forEach(input => {
+            if (input.value) {
+                completed++;
+            }
+        });
+        
+        const percentage = Math.round((completed / total) * 100);
+        progressBar.style.width = `${percentage}%`;
+        progressBar.setAttribute('aria-valuenow', percentage);
+        progressBar.textContent = `${percentage}%`;
+        progressText.textContent = `${completed} of ${total} inputs completed`;
+    }
+    
+    function displayEstimate(result) {
+        let html = `
+            <div class="card">
+                <div class="card-header">
+                    <h3>Estimate Summary</h3>
+                </div>
+                <div class="card-body">
+                    <h4>Total Cost: ₹${result.total_cost.toLocaleString('en-IN')}</h4>
+                    <p>Estimations Left: ${result.estimations_left}</p>
+                    
+                    <table class="table table-bordered mt-4">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Eco+ (₹)</th>
+                                <th>Standard (₹)</th>
+                                <th>Premium (₹)</th>
+                                <th>Selected (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+        
+        for (const [category, costs] of Object.entries(result.details)) {
+            html += `
+                <tr>
+                    <td>${category}</td>
+                    <td>${costs.eco.toLocaleString('en-IN')}</td>
+                    <td>${costs.standard.toLocaleString('en-IN')}</td>
+                    <td>${costs.premium.toLocaleString('en-IN')}</td>
+                    <td>${costs.selected_cost.toLocaleString('en-IN')}</td>
+                </tr>
+            `;
+        }
+        
+        html += `
+                        </tbody>
+                    </table>
+                    
+                    <div class="mt-4">
+                        <button class="btn btn-success" onclick="window.print()">Download Estimate</button>
+                        <a href="/subscription" class="btn btn-primary">Subscribe for Detailed Breakdown</a>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('estimateResult').innerHTML = html;
+    }
+});
+</script>
+{% endblock %}

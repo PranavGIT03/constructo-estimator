@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Guide to Building a Home</h2>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-category="construction">Construction Stages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-category="budget">Budget Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-category="materials">Material Selection</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-category="mistakes">Common Mistakes</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div id="articlesContainer">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 id="articleTitle">Article Content</h5>
+            </div>
+            <div class="card-body">
+                <div id="articleContent">
+                    <p class="text-center">Select an article to view its content.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentCategory = 'construction';
+    
+    // Load articles for the initial category
+    loadArticles(currentCategory);
+    
+    // Category selection
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Update active state
+            document.querySelectorAll('.nav-link').forEach(l => {
+                l.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            // Update current category
+            currentCategory = this.getAttribute('data-category');
+            
+            // Load articles for the selected category
+            loadArticles(currentCategory);
+        });
+    });
+    
+    async function loadArticles(category) {
+        try {
+            // Show loading spinner
+            document.getElementById('articlesContainer').innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `;
+            
+            const response = await fetch(`/api/articles?category=${encodeURIComponent(category)}`);
+            const articles = await response.json();
+            
+            displayArticles(articles);
+        } catch (error) {
+            console.error('Error loading articles:', error);
+            document.getElementById('articlesContainer').innerHTML = `
+                <div class="alert alert-danger">
+                    An error occurred while loading articles.
+                </div>
+            `;
+        }
+    }
+    
+    function displayArticles(articles) {
+        const container = document.getElementById('articlesContainer');
+        
+        if (articles.length === 0) {
+            container.innerHTML = `
+                <div class="alert alert-info">
+                    No articles found for this category.
+                </div>
+            `;
+            return;
+        }
+        
+        let html = `<div class="list-group">`;
+        
+        articles.forEach(article => {
+            html += `
+                <a href="#" class="list-group-item list-group-item-action article-item" data-article-id="${article.id}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">${article.title}</h5>
+                        <small>${new Date(article.created_at).toLocaleDateString()}</small>
+                    </div>
+                </a>
+            `;
+        });
+        
+        html += `</div>`;
+        
+        container.innerHTML = html;
+        
+        // Add event listeners to article items
+        document.querySelectorAll('.article-item').forEach(item => {
+            item.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                // Update active state
+                document.querySelectorAll('.article-item').forEach(i => {
+                    i.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Get article ID
+                const articleId = this.getAttribute('data-article-id');
+                
+                // Load article content
+                await loadArticleContent(articleId);
+            });
+        });
+    }
+    
+    async function loadArticleContent(articleId) {
+        try {
+            // Show loading spinner
+            document.getElementById('articleContent').innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `;
+            
+            const response = await fetch(`/api/article/${articleId}`);
+            const article = await response.json();
+            
+            document.getElementById('articleTitle').textContent = article.title;
+            document.getElementById('articleContent').innerHTML = article.content;
+        } catch (error) {
+            console.error('Error loading article content:', error);
+            document.getElementById('articleContent').innerHTML = `
+                <div class="alert alert-danger">
+                    An error occurred while loading the article content.
+                </div>
+            `;
+        }
+    }
+});
+</script>
+{% endblock %}

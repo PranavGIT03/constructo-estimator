@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Subscription Plans</h2>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="alert alert-info">
+            <h5>Current Plan: {{ current_user.subscription_type.capitalize() }}</h5>
+            <p>Estimations Left: {{ current_user.estimations_left }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h3 class="my-0">Free Plan</h3>
+            </div>
+            <div class="card-body">
+                <h2 class="card-title pricing-card-title">₹0 <small class="text-muted">/ month</small></h2>
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>3 Free Estimates</li>
+                    <li>Basic Cost Breakdown</li>
+                    <li>Limited Sample Plans</li>
+                    <li>Basic Material Information</li>
+                    <li>No Detailed Product Selection</li>
+                </ul>
+                {% if current_user.subscription_type == 'free' %}
+                <button class="btn btn-lg btn-block btn-outline-primary w-100" disabled>Current Plan</button>
+                {% else %}
+                <button class="btn btn-lg btn-block btn-outline-primary w-100" disabled>Downgrade</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h3 class="my-0">Premium Plan</h3>
+            </div>
+            <div class="card-body">
+                <h2 class="card-title pricing-card-title">₹999 <small class="text-muted">/ month</small></h2>
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>Unlimited Estimates</li>
+                    <li>Detailed Cost Breakdown</li>
+                    <li>All Sample Plans</li>
+                    <li>Detailed Product Information</li>
+                    <li>Brand & Product Customization</li>
+                    <li>Labor Cost Breakdown</li>
+                    <li>Expert Tips & Recommendations</li>
+                    <li>Priority Support</li>
+                </ul>
+                {% if current_user.subscription_type == 'premium' %}
+                <button class="btn btn-lg btn-block btn-primary w-100" disabled>Current Plan</button>
+                {% else %}
+                <button id="upgradeBtn" class="btn btn-lg btn-block btn-primary w-100">Upgrade Now</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Premium Benefits</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Detailed Product Breakdown</h6>
+                        <p>See exactly which products have been included in your estimate and at what rate.</p>
+                        
+                        <h6>Labor Charges</h6>
+                        <p>Get a clear breakdown of labor costs for each category of work.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Brand Selection</h6>
+                        <p>Toggle between different brands and customize your selections.</p>
+                        
+                        <h6>Expert Tips</h6>
+                        <p>Access professional tips and advice for each stage of construction.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const upgradeBtn = document.getElementById('upgradeBtn');
+    
+    if (upgradeBtn) {
+        upgradeBtn.addEventListener('click', async function() {
+            try {
+                const response = await fetch('/api/upgrade-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('Subscription upgraded successfully! You now have premium access.');
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + (result.error || 'An error occurred while upgrading your subscription.'));
+                }
+            } catch (error) {
+                alert('An error occurred while upgrading your subscription.');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

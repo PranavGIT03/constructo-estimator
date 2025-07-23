@@ -1,0 +1,529 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Manage Materials</h2>
+
+<div class="mb-3">
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMaterialModal">Add New Material</button>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search materials...">
+            </div>
+            <div class="col-md-3">
+                <select id="categoryFilter" class="form-select">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="tierFilter" class="form-select">
+                    <option value="">All Tiers</option>
+                    <option value="eco">Eco+</option>
+                    <option value="standard">Standard</option>
+                    <option value="premium">Premium</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button id="refreshBtn" class="btn btn-info w-100">Refresh</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Category</th>
+                        <th>Subcategory</th>
+                        <th>Name</th>
+                        <th>Brand</th>
+                        <th>Unit</th>
+                        <th>Price (₹)</th>
+                        <th>Tier</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="materialsTableBody">
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Material Modal -->
+<div class="modal fade" id="addMaterialModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Material</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMaterialForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Civil Work">Civil Work</option>
+                                    <option value="Electrical">Electrical</option>
+                                    <option value="Plumbing">Plumbing</option>
+                                    <option value="Sanitation">Sanitation</option>
+                                    <option value="Steel Roofing">Steel Roofing</option>
+                                    <option value="Windows">Windows</option>
+                                    <option value="Tiling">Tiling</option>
+                                    <option value="Kitchen">Kitchen</option>
+                                    <option value="Furniture">Furniture</option>
+                                    <option value="Paint">Paint</option>
+                                    <option value="Fall Ceiling">Fall Ceiling</option>
+                                    <option value="Doors">Doors</option>
+                                    <option value="Solar">Solar</option>
+                                    <option value="HVAC">HVAC</option>
+                                    <option value="Waterproofing">Waterproofing</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="subcategory" class="form-label">Subcategory</label>
+                                <input type="text" class="form-control" id="subcategory" name="subcategory">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="brand" class="form-label">Brand</label>
+                                <input type="text" class="form-control" id="brand" name="brand">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="unit" class="form-label">Unit</label>
+                                <input type="text" class="form-control" id="unit" name="unit" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="price" class="form-label">Price (₹)</label>
+                                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="tier" class="form-label">Tier</label>
+                                <select class="form-select" id="tier" name="tier" required>
+                                    <option value="eco">Eco+</option>
+                                    <option value="standard">Standard</option>
+                                    <option value="premium">Premium</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="labor_cost_percentage" class="form-label">Labor Cost Percentage</label>
+                                <input type="number" class="form-control" id="labor_cost_percentage" name="labor_cost_percentage" min="0" max="100" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tips" class="form-label">Tips & Recommendations</label>
+                        <textarea class="form-control" id="tips" name="tips" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveNewMaterialBtn">Save Material</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Material Modal -->
+<div class="modal fade" id="editMaterialModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Material</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editMaterialForm">
+                    <input type="hidden" id="edit_id" name="id">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_category" class="form-label">Category</label>
+                                <select class="form-select" id="edit_category" name="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Civil Work">Civil Work</option>
+                                    <option value="Electrical">Electrical</option>
+                                    <option value="Plumbing">Plumbing</option>
+                                    <option value="Sanitation">Sanitation</option>
+                                    <option value="Steel Roofing">Steel Roofing</option>
+                                    <option value="Windows">Windows</option>
+                                    <option value="Tiling">Tiling</option>
+                                    <option value="Kitchen">Kitchen</option>
+                                    <option value="Furniture">Furniture</option>
+                                    <option value="Paint">Paint</option>
+                                    <option value="Fall Ceiling">Fall Ceiling</option>
+                                    <option value="Doors">Doors</option>
+                                    <option value="Solar">Solar</option>
+                                    <option value="HVAC">HVAC</option>
+                                    <option value="Waterproofing">Waterproofing</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_subcategory" class="form-label">Subcategory</label>
+                                <input type="text" class="form-control" id="edit_subcategory" name="subcategory">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="edit_name" name="name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_brand" class="form-label">Brand</label>
+                                <input type="text" class="form-control" id="edit_brand" name="brand">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="edit_unit" class="form-label">Unit</label>
+                                <input type="text" class="form-control" id="edit_unit" name="unit" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="edit_price" class="form-label">Price (₹)</label>
+                                <input type="number" class="form-control" id="edit_price" name="price" min="0" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="edit_tier" class="form-label">Tier</label>
+                                <select class="form-select" id="edit_tier" name="tier" required>
+                                    <option value="eco">Eco+</option>
+                                    <option value="standard">Standard</option>
+                                    <option value="premium">Premium</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_labor_cost_percentage" class="form-label">Labor Cost Percentage</label>
+                                <input type="number" class="form-control" id="edit_labor_cost_percentage" name="labor_cost_percentage" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="edit_tips" class="form-label">Tips & Recommendations</label>
+                        <textarea class="form-control" id="edit_tips" name="tips" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="deleteMaterialBtn">Delete</button>
+                <button type="button" class="btn btn-primary" id="updateMaterialBtn">Update Material</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let materials = [];
+    let categories = [];
+    
+    // Load materials on page load
+    loadMaterials();
+    
+    // Event listeners
+    document.getElementById('refreshBtn').addEventListener('click', loadMaterials);
+    document.getElementById('searchInput').addEventListener('input', filterMaterials);
+    document.getElementById('categoryFilter').addEventListener('change', filterMaterials);
+    document.getElementById('tierFilter').addEventListener('change', filterMaterials);
+    
+    document.getElementById('saveNewMaterialBtn').addEventListener('click', saveMaterial);
+    document.getElementById('updateMaterialBtn').addEventListener('click', updateMaterial);
+    document.getElementById('deleteMaterialBtn').addEventListener('click', deleteMaterial);
+    
+    async function loadMaterials() {
+        try {
+            const response = await fetch('/api/admin/materials');
+            materials = await response.json();
+            
+            // Extract unique categories
+            categories = [...new Set(materials.map(m => m.category))];
+            
+            // Populate category filter
+            const categoryFilter = document.getElementById('categoryFilter');
+            categoryFilter.innerHTML = '<option value="">All Categories</option>';
+            
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+            
+            // Display materials
+            displayMaterials(materials);
+        } catch (error) {
+            console.error('Error loading materials:', error);
+            alert('Failed to load materials. Please try again.');
+        }
+    }
+    
+    function displayMaterials(materialsToDisplay) {
+        const tbody = document.getElementById('materialsTableBody');
+        
+        if (materialsToDisplay.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center">No materials found</td></tr>';
+            return;
+        }
+        
+        let html = '';
+        
+        materialsToDisplay.forEach(material => {
+            html += `
+                <tr>
+                    <td>${material.id}</td>
+                    <td>${material.category}</td>
+                    <td>${material.subcategory || '-'}</td>
+                    <td>${material.name}</td>
+                    <td>${material.brand || '-'}</td>
+                    <td>${material.unit}</td>
+                    <td>${material.price}</td>
+                    <td>${material.tier || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary edit-btn" data-id="${material.id}">Edit</button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = html;
+        
+        // Add event listeners to edit buttons
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const materialId = this.getAttribute('data-id');
+                openEditModal(materialId);
+            });
+        });
+    }
+    
+    function filterMaterials() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        const tierFilter = document.getElementById('tierFilter').value;
+        
+        const filteredMaterials = materials.filter(material => {
+            const matchesSearch = 
+                material.name.toLowerCase().includes(searchTerm) ||
+                (material.brand && material.brand.toLowerCase().includes(searchTerm)) ||
+                material.category.toLowerCase().includes(searchTerm) ||
+                (material.subcategory && material.subcategory.toLowerCase().includes(searchTerm));
+            
+            const matchesCategory = !categoryFilter || material.category === categoryFilter;
+            const matchesTier = !tierFilter || material.tier === tierFilter;
+            
+            return matchesSearch && matchesCategory && matchesTier;
+        });
+        
+        displayMaterials(filteredMaterials);
+    }
+    
+    async function saveMaterial() {
+        const form = document.getElementById('addMaterialForm');
+        
+        const materialData = {
+            category: document.getElementById('category').value,
+            subcategory: document.getElementById('subcategory').value,
+            name: document.getElementById('name').value,
+            brand: document.getElementById('brand').value,
+            unit: document.getElementById('unit').value,
+            price: parseFloat(document.getElementById('price').value),
+            tier: document.getElementById('tier').value,
+            labor_cost_percentage: parseFloat(document.getElementById('labor_cost_percentage').value),
+            tips: document.getElementById('tips').value
+        };
+        
+        try {
+            const response = await fetch('/api/admin/material', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(materialData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Material added successfully!');
+                form.reset();
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addMaterialModal'));
+                modal.hide();
+                
+                // Reload materials
+                loadMaterials();
+            } else {
+                alert('Error: ' + (result.error || 'Failed to add material'));
+            }
+        } catch (error) {
+            console.error('Error adding material:', error);
+            alert('Failed to add material. Please try again.');
+        }
+    }
+    
+    function openEditModal(materialId) {
+        const material = materials.find(m => m.id == materialId);
+        
+        if (!material) {
+            alert('Material not found');
+            return;
+        }
+        
+        // Populate form fields
+        document.getElementById('edit_id').value = material.id;
+        document.getElementById('edit_category').value = material.category;
+        document.getElementById('edit_subcategory').value = material.subcategory || '';
+        document.getElementById('edit_name').value = material.name;
+        document.getElementById('edit_brand').value = material.brand || '';
+        document.getElementById('edit_unit').value = material.unit;
+        document.getElementById('edit_price').value = material.price;
+        document.getElementById('edit_tier').value = material.tier || 'standard';
+        document.getElementById('edit_labor_cost_percentage').value = material.labor_cost_percentage || 0;
+        document.getElementById('edit_tips').value = material.tips || '';
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('editMaterialModal'));
+        modal.show();
+    }
+    
+    async function updateMaterial() {
+        const materialId = document.getElementById('edit_id').value;
+        
+        const materialData = {
+            category: document.getElementById('edit_category').value,
+            subcategory: document.getElementById('edit_subcategory').value,
+            name: document.getElementById('edit_name').value,
+            brand: document.getElementById('edit_brand').value,
+            unit: document.getElementById('edit_unit').value,
+            price: parseFloat(document.getElementById('edit_price').value),
+            tier: document.getElementById('edit_tier').value,
+            labor_cost_percentage: parseFloat(document.getElementById('edit_labor_cost_percentage').value),
+            tips: document.getElementById('edit_tips').value
+        };
+        
+        try {
+            const response = await fetch(`/api/admin/material/${materialId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(materialData)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Material updated successfully!');
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editMaterialModal'));
+                modal.hide();
+                
+                // Reload materials
+                loadMaterials();
+            } else {
+                alert('Error: ' + (result.error || 'Failed to update material'));
+            }
+        } catch (error) {
+            console.error('Error updating material:', error);
+            alert('Failed to update material. Please try again.');
+        }
+    }
+    
+    async function deleteMaterial() {
+        if (!confirm('Are you sure you want to delete this material?')) {
+            return;
+        }
+        
+        const materialId = document.getElementById('edit_id').value;
+        
+        try {
+            const response = await fetch(`/api/admin/material/${materialId}`, {
+                method: 'DELETE'
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Material deleted successfully!');
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editMaterialModal'));
+                modal.hide();
+                
+                // Reload materials
+                loadMaterials();
+            } else {
+                alert('Error: ' + (result.error || 'Failed to delete material'));
+            }
+        } catch (error) {
+            console.error('Error deleting material:', error);
+            alert('Failed to delete material. Please try again.');
+        }
+    }
+});
+</script>
+{% endblock %}

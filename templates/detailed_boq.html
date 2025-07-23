@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Detailed BOQ + Product Selector</h2>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="alert alert-info">
+            {% if current_user.subscription_type == 'premium' %}
+                <h5>Premium Subscriber</h5>
+                <p>You have full access to all detailed product information and customization options.</p>
+            {% else %}
+                <h5>Free User</h5>
+                <p>Upgrade to Premium to access detailed product information and customization options.</p>
+                <a href="/subscription" class="btn btn-primary">Upgrade to Premium</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group mb-4">
+            <a href="#" class="list-group-item list-group-item-action active" data-category="Civil Work">Civil Work</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Electrical">Electrical</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Plumbing">Plumbing</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Sanitation">Sanitation</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Steel Roofing">Steel Roofing</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Windows">Windows</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Tiling">Tiling</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Kitchen">Kitchen</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Furniture">Furniture</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Paint">Paint</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Fall Ceiling">Fall Ceiling</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Doors">Doors</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Solar">Solar</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="HVAC">HVAC</a>
+            <a href="#" class="list-group-item list-group-item-action" data-category="Waterproofing">Waterproofing</a>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 id="categoryTitle">Civil Work</h5>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-secondary active" data-tier="eco">Eco+</button>
+                    <button type="button" class="btn btn-outline-secondary" data-tier="standard">Standard</button>
+                    <button type="button" class="btn btn-outline-secondary" data-tier="premium">Premium</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="subcategoryFilter" class="mb-3">
+                    <!-- Subcategory filters will be added here -->
+                </div>
+                
+                <div id="materialsContainer">
+                    <!-- Materials will be displayed here -->
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if current_user.subscription_type != 'premium' %}
+                <div class="mt-4 p-3 bg-light">
+                    <h5>Premium Features</h5>
+                    <ul>
+                        <li>View detailed product specifications</li>
+                        <li>Compare different brands and models</li>
+                        <li>See labor costs for installation</li>
+                        <li>Access expert tips and recommendations</li>
+                        <li>Customize and save your selections</li>
+                    </ul>
+                    <a href="/subscription" class="btn btn-primary">Upgrade to Premium</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if current_user.subscription_type == 'premium' %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Tips & Recommendations</h5>
+            </div>
+            <div class="card-body" id="tipsContainer">
+                <p>Select a material to see specific tips and recommendations.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentCategory = 'Civil Work';
+    let currentTier = 'eco';
+    let currentSubcategory = '';
+    
+    // Load materials for the initial category
+    loadMaterials(currentCategory, currentTier, currentSubcategory);
+    
+    // Category selection
+    document.querySelectorAll('.list-group-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Update active state
+            document.querySelectorAll('.list-group-item').forEach(i => {
+                i.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            // Update current category
+            currentCategory = this.getAttribute('data-category');
+            document.getElementById('categoryTitle').textContent = currentCategory;
+            
+            // Reset subcategory
+            currentSubcategory = '';
+            
+            // Load materials for the selected category
+            loadMaterials(currentCategory, currentTier, currentSubcategory);
+        });
+    });
+    
+    // Tier selection
+    document.querySelectorAll('[data-tier]').forEach(button => {
+        button.addEventListener('click', function() {
+            // Update active state
+            document.querySelectorAll('[data-tier]').forEach(b => {
+                b.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            // Update current tier
+            currentTier = this.getAttribute('data-tier');
+            
+            // Load materials for the selected tier
+            loadMaterials(currentCategory, currentTier, currentSubcategory);
+        });
+    });
+    
+    async function loadMaterials(category, tier, subcategory) {
+        try {
+            // Show loading spinner
+            document.getElementById('materialsContainer').innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `;
+            
+            // Load subcategories first
+            await loadSubcategories(category);
+            
+            // Then load materials
+            let url = `/api/materials?category=${encodeURIComponent(category)}&tier=${encodeURIComponent(tier)}`;
+            
+            if (subcategory) {
+                url += `&subcategory=${encodeURIComponent(subcategory)}`;
+            }
+            
+            const response = await fetch(url);
+            const materials = await response.json();
+            
+            displayMaterials(materials);
+        } catch (error) {
+            console.error('Error loading materials:', error);
+            document.getElementById('materialsContainer').innerHTML = `
+                <div class="alert alert-danger">
+                    An error occurred while loading materials.
+                </div>
+            `;
+        }
+    }
+    
+    async function loadSubcategories(category) {
+        try {
+            const response = await fetch(`/api/subcategories?category=${encodeURIComponent(category)}`);
+            const subcategories = await response.json();
+            
+            const container = document.getElementById('subcategoryFilter');
+            
+            if (subcategories.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = `
+                <label>Filter by Subcategory:</label>
+                <div class="btn-group mb-3" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-secondary active" data-subcategory="">All</button>
+            `;
+            
+            subcategories.forEach(subcategory => {
+                html += `
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-subcategory="${subcategory}">${subcategory}</button>
+                `;
+            });
+            
+            html += `</div>`;
+            
+            container.innerHTML = html;
+            
+            // Add event listeners to subcategory buttons
+            document.querySelectorAll('[data-subcategory]').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active state
+                    document.querySelectorAll('[data-subcategory]').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Update current subcategory
+                    currentSubcategory = this.getAttribute('data-subcategory');
+                    
+                    // Load materials for the selected subcategory
+                    loadMaterials(currentCategory, currentTier, currentSubcategory);
+                });
+            });
+        } catch (error) {
+            console.error('Error loading subcategories:', error);
+        }
+    }
+    
+    function displayMaterials(materials) {
+        const container = document.getElementById('materialsContainer');
+        const isPremium = {{ 'true' if current_user.subscription_type == 'premium' else 'false' }};
+        
+        if (materials.length === 0) {
+            container.innerHTML = `
+                <div class="alert alert-info">
+                    No materials found for the selected criteria.
+                </div>
+            `;
+            return;
+        }
+        
+        let html = `
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Brand</th>
+                            <th>Unit</th>
+                            <th>Price (₹)</th>
+                            ${isPremium ? '<th>Labor Cost</th>' : ''}
+                            ${isPremium ? '<th>Actions</th>' : ''}
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        materials.forEach(material => {
+            const laborCost = material.price * (material.labor_cost_percentage / 100);
+            
+            html += `
+                <tr data-material-id="${material.id}">
+                    <td>${material.name}</td>
+                    <td>${material.brand || '-'}</td>
+                    <td>${material.unit}</td>
+                    <td>${material.price.toLocaleString('en-IN')}</td>
+                    ${isPremium ? `<td>${laborCost.toLocaleString('en-IN')}</td>` : ''}
+                    ${isPremium ? `
+                        <td>
+                            <button class="btn btn-sm btn-info view-tips" data-material-id="${material.id}">
+                                View Tips
+                            </button>
+                        </td>
+                    ` : ''}
+                </tr>
+            `;
+        });
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        
+        // Add event listeners to view tips buttons
+        if (isPremium) {
+            document.querySelectorAll('.view-tips').forEach(button => {
+                button.addEventListener('click', function() {
+                    const materialId = this.getAttribute('data-material-id');
+                    const material = materials.find(m => m.id == materialId);
+                    
+                    if (material && material.tips) {
+                        document.getElementById('tipsContainer').innerHTML = `
+                            <h6>${material.name} ${material.brand ? `(${material.brand})` : ''}</h6>
+                            <p>${material.tips}</p>
+                        `;
+                    } else {
+                        document.getElementById('tipsContainer').innerHTML = `
+                            <p>No tips available for this material.</p>
+                        `;
+                    }
+                });
+            });
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Sample Plan Selector</h2>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Enter Your Plot Details</h5>
+            </div>
+            <div class="card-body">
+                <form id="plotDetailsForm">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="plot_width" class="form-label">Plot Width (feet)</label>
+                                <input type="number" class="form-control" id="plot_width" name="plot_width" min="15" max="60" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="plot_length" class="form-label">Plot Length (feet)</label>
+                                <input type="number" class="form-control" id="plot_length" name="plot_length" min="20" max="60" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="plot_direction" class="form-label">Plot Direction</label>
+                                <div class="input-group">
+                                    <select class="form-select" id="plot_direction" name="plot_direction">
+                                        <option value="north">North Facing</option>
+                                        <option value="south">South Facing</option>
+                                        <option value="east">East Facing</option>
+                                        <option value="west">West Facing</option>
+                                        <option value="northeast">North-East Facing</option>
+                                        <option value="northwest">North-West Facing</option>
+                                        <option value="southeast">South-East Facing</option>
+                                        <option value="southwest">South-West Facing</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="floors" class="form-label">Number of Floors</label>
+                                <select class="form-select" id="floors" name="floors">
+                                    <option value="1">Ground only</option>
+                                    <option value="2">G+1</option>
+                                    <option value="3">G+2</option>
+                                    <option value="4">G+3</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Find Plans</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div id="plansContainer" class="row">
+            <!-- Plans will be displayed here -->
+            <div class="col-12 text-center">
+                <p>Enter your plot details to see matching plans</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('plotDetailsForm');
+    
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const width = document.getElementById('plot_width').value;
+        const length = document.getElementById('plot_length').value;
+        const floors = document.getElementById('floors').value;
+        
+        try {
+            const response = await fetch(`/api/sample-plans?width=${width}&length=${length}&floors=${floors}`);
+            const plans = await response.json();
+            
+            displayPlans(plans);
+        } catch (error) {
+            console.error('Error fetching plans:', error);
+            document.getElementById('plansContainer').innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        An error occurred while fetching plans.
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    function displayPlans(plans) {
+        const container = document.getElementById('plansContainer');
+        
+        if (plans.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center">
+                    <p>No plans found matching your criteria. Try adjusting your plot details.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        
+        plans.forEach(plan => {
+            html += `
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="${plan.thumbnail_path || '/static/placeholder.jpg'}" class="card-img-top" alt="${plan.name}">
+                        <div class="card-body">
+                            <h5 class="card-title">${plan.name}</h5>
+                            <p class="card-text">
+                                Size: ${plan.min_width}' x ${plan.min_length}' to ${plan.max_width}' x ${plan.max_length}'<br>
+                                Floors: ${plan.floors === 1 ? 'Ground only' : 'G+' + (plan.floors - 1)}
+                            </p>
+                            <a href="/api/sample-plan/${plan.id}" class="btn btn-primary" download>Download Plan</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+});
+</script>
+{% endblock %}

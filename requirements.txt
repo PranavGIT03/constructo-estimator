@@ -1,3 +1,8 @@
 Flask==2.3.3
 Flask-Login==0.6.3
-Werkzeug==2.3.7firebase-admin
+Werkzeug==2.3.7
+firebase-admin
+SQLAlchemy
+flask-sqlalchemy
+pandas
+openpyxl
