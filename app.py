@@ -848,30 +848,205 @@ if __name__ == '__main__':
         # Create sample materials if none exist
         if not Material.query.first():
             materials = [
-                Material(category='Civil Work', subcategory='Cement', name='Cement', brand='UltraTech', unit='bag', price=350, tier='standard'),
-                Material(category='Civil Work', subcategory='Steel', name='Steel Rebar', brand='Tata', unit='kg', price=65, tier='standard'),
-                Material(category='Civil Work', subcategory='Sand', name='Sand', brand='', unit='cubic_ft', price=45, tier='standard'),
-                Material(category='Electrical', subcategory='Wire', name='Copper Wire', brand='Havells', unit='meter', price=12, tier='standard'),
-                Material(category='Electrical', subcategory='Switches', name='Switch', brand='Anchor', unit='piece', price=85, tier='standard'),
-                Material(category='Plumbing', subcategory='Pipes', name='PVC Pipe', brand='Astral', unit='meter', price=45, tier='standard'),
+                # RCC/Civil Work Materials
+                # Sand, Aggregate, Brick - blank rates for admin input
+                Material(category='Civil Work', subcategory='Sand', name='Standard Sand', brand='', unit='cft', price=0, tier='standard'),
+                Material(category='Civil Work', subcategory='Aggregate', name='Standard Aggregate', brand='', unit='cft', price=0, tier='standard'),
+                Material(category='Civil Work', subcategory='Brick', name='Standard Brick', brand='', unit='piece', price=0, tier='standard'),
                 
-                # Add some eco and premium options
-                Material(category='Civil Work', subcategory='Cement', name='Cement', brand='Ambuja', unit='bag', price=320, tier='eco'),
-                Material(category='Civil Work', subcategory='Cement', name='Cement', brand='JK', unit='bag', price=380, tier='premium'),
+                # Cement brands
+                Material(category='Civil Work', subcategory='Cement', name='Cement', brand='UltraTech', unit='bag', price=360, tier='premium'),
+                Material(category='Civil Work', subcategory='Cement', name='Cement', brand='Birla', unit='bag', price=320, tier='standard'),
+                Material(category='Civil Work', subcategory='Cement', name='Cement', brand='JK', unit='bag', price=320, tier='standard'),
                 
-                Material(category='Windows', subcategory='Sliding', name='Sliding Window', brand='Standard', unit='sq ft', price=250, tier='standard', 
+                # Steel brands
+                Material(category='Civil Work', subcategory='Steel', name='Steel', brand='Tata', unit='kg', price=65, tier='premium'),
+                Material(category='Civil Work', subcategory='Steel', name='Steel', brand='Moyra', unit='kg', price=63, tier='standard'),
+                Material(category='Civil Work', subcategory='Steel', name='Steel', brand='Ikon', unit='kg', price=63, tier='standard'),
+                
+                # Electrical Materials
+                # MS Box
+                Material(category='Electrical', subcategory='MS.Box', name='2-module', brand='', unit='piece', price=25, tier='standard'),
+                Material(category='Electrical', subcategory='MS.Box', name='3-module', brand='', unit='piece', price=30, tier='standard'),
+                Material(category='Electrical', subcategory='MS.Box', name='4-module', brand='', unit='piece', price=38, tier='standard'),
+                Material(category='Electrical', subcategory='MS.Box', name='6-module', brand='', unit='piece', price=55, tier='standard'),
+                Material(category='Electrical', subcategory='MS.Box', name='8-module', brand='', unit='piece', price=63, tier='standard'),
+                Material(category='Electrical', subcategory='MS.Box', name='12-module', brand='', unit='piece', price=71, tier='standard'),
+                
+                # Electrical Conduit
+                Material(category='Electrical', subcategory='Electrical Conduit', name='1-inch H.M.S', brand='Precision', unit='piece', price=72, tier='standard'),
+                Material(category='Electrical', subcategory='Electrical Conduit', name='1-inch H.M.S', brand='Polycab', unit='piece', price=74, tier='premium'),
+                Material(category='Electrical', subcategory='Electrical Conduit', name='1-inch M.M.S', brand='Precision', unit='piece', price=56, tier='eco'),
+                Material(category='Electrical', subcategory='Electrical Conduit', name='1-inch M.M.S', brand='Polycab', unit='piece', price=58, tier='standard'),
+                
+                # Wire (per 100mm bundle)
+                Material(category='Electrical', subcategory='Wire', name='0.75mm', brand='KEI', unit='100mm bundle', price=1077, tier='standard'),
+                Material(category='Electrical', subcategory='Wire', name='0.75mm', brand='Polycab', unit='100mm bundle', price=1126, tier='premium'),
+                Material(category='Electrical', subcategory='Wire', name='1.00mm', brand='KEI', unit='100mm bundle', price=1389, tier='standard'),
+                Material(category='Electrical', subcategory='Wire', name='1.00mm', brand='Polycab', unit='100mm bundle', price=1436, tier='premium'),
+                Material(category='Electrical', subcategory='Wire', name='1.5mm', brand='KEI', unit='100mm bundle', price=2064, tier='standard'),
+                Material(category='Electrical', subcategory='Wire', name='1.5mm', brand='Polycab', unit='100mm bundle', price=2064, tier='standard'),
+                Material(category='Electrical', subcategory='Wire', name='2.5mm', brand='KEI', unit='100mm bundle', price=3310, tier='standard'),
+                Material(category='Electrical', subcategory='Wire', name='2.5mm', brand='Polycab', unit='100mm bundle', price=3398, tier='premium'),
+                Material(category='Electrical', subcategory='Wire', name='4.0mm', brand='KEI', unit='100mm bundle', price=4913, tier='standard'),
+                Material(category='Electrical', subcategory='Wire', name='4.0mm', brand='Polycab', unit='100mm bundle', price=5216, tier='premium'),
+                
+                # Switches & Sockets - L&T variants
+                Material(category='Electrical', subcategory='Switches&Sockets', name='Basic Switch', brand='L&T Engem', unit='piece', price=30, tier='eco'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='Basic Switch', brand='L&T Entice', unit='piece', price=60, tier='standard'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='Basic Switch', brand='L&T Englaze', unit='piece', price=90, tier='premium'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='Fan Regulator (2-module)', brand='L&T Engem', unit='piece', price=383, tier='eco'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='Fan Regulator (2-module)', brand='L&T Entice', unit='piece', price=696, tier='standard'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='Fan Regulator (2-module)', brand='L&T Englaze', unit='piece', price=765, tier='premium'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='USB Socket', brand='L&T Engem', unit='piece', price=824, tier='eco'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='USB Socket', brand='L&T Entice', unit='piece', price=1243, tier='standard'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='USB Socket', brand='L&T Englaze', unit='piece', price=1369, tier='premium'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='USB Type-C Socket', brand='L&T Entice', unit='piece', price=1700, tier='standard'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='USB Type-C Socket', brand='L&T Englaze', unit='piece', price=1809, tier='premium'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='16A Power Switch', brand='L&T Engem', unit='piece', price=108, tier='eco'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='16A Power Switch', brand='L&T Entice', unit='piece', price=191, tier='standard'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='16A Power Switch', brand='L&T Englaze', unit='piece', price=245, tier='premium'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='6A Socket', brand='L&T Engem', unit='piece', price=97, tier='eco'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='6A Socket', brand='L&T Entice', unit='piece', price=142, tier='standard'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='6A Socket', brand='L&T Englaze', unit='piece', price=196, tier='premium'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='16A Socket', brand='L&T Engem', unit='piece', price=156, tier='eco'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='16A Socket', brand='L&T Entice', unit='piece', price=311, tier='standard'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='16A Socket', brand='L&T Englaze', unit='piece', price=323, tier='premium'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='CAT-6 Jack', brand='L&T Engem', unit='piece', price=498, tier='eco'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='CAT-6 Jack', brand='L&T Entice', unit='piece', price=723, tier='standard'),
+                Material(category='Electrical', subcategory='Switches&Sockets', name='CAT-6 Jack', brand='L&T Englaze', unit='piece', price=736, tier='premium'),
+                
+                # Switch Plates
+                Material(category='Electrical', subcategory='Switch Plate', name='2-module', brand='L&T Engem', unit='piece', price=80, tier='eco'),
+                Material(category='Electrical', subcategory='Switch Plate', name='2-module', brand='L&T Entice', unit='piece', price=150, tier='standard'),
+                Material(category='Electrical', subcategory='Switch Plate', name='2-module', brand='L&T Englaze', unit='piece', price=173, tier='premium'),
+                Material(category='Electrical', subcategory='Switch Plate', name='3-module', brand='L&T Engem', unit='piece', price=104, tier='eco'),
+                Material(category='Electrical', subcategory='Switch Plate', name='3-module', brand='L&T Entice', unit='piece', price=194, tier='standard'),
+                Material(category='Electrical', subcategory='Switch Plate', name='3-module', brand='L&T Englaze', unit='piece', price=201, tier='premium'),
+                Material(category='Electrical', subcategory='Switch Plate', name='4-module', brand='L&T Engem', unit='piece', price=122, tier='eco'),
+                Material(category='Electrical', subcategory='Switch Plate', name='4-module', brand='L&T Entice', unit='piece', price=222, tier='standard'),
+                Material(category='Electrical', subcategory='Switch Plate', name='4-module', brand='L&T Englaze', unit='piece', price=230, tier='premium'),
+                Material(category='Electrical', subcategory='Switch Plate', name='6-module', brand='L&T Engem', unit='piece', price=180, tier='eco'),
+                Material(category='Electrical', subcategory='Switch Plate', name='6-module', brand='L&T Entice', unit='piece', price=300, tier='standard'),
+                Material(category='Electrical', subcategory='Switch Plate', name='6-module', brand='L&T Englaze', unit='piece', price=356, tier='premium'),
+                Material(category='Electrical', subcategory='Switch Plate', name='8-module', brand='L&T Engem', unit='piece', price=213, tier='eco'),
+                Material(category='Electrical', subcategory='Switch Plate', name='8-module', brand='L&T Entice', unit='piece', price=353, tier='standard'),
+                Material(category='Electrical', subcategory='Switch Plate', name='8-module', brand='L&T Englaze', unit='piece', price=423, tier='premium'),
+                Material(category='Electrical', subcategory='Switch Plate', name='12-module', brand='L&T Engem', unit='piece', price=288, tier='eco'),
+                Material(category='Electrical', subcategory='Switch Plate', name='12-module', brand='L&T Entice', unit='piece', price=479, tier='standard'),
+                Material(category='Electrical', subcategory='Switch Plate', name='12-module', brand='L&T Englaze', unit='piece', price=570, tier='premium'),
+                
+                # Downlights
+                Material(category='Electrical', subcategory='Downlights', name='12W', brand='Jaguar', unit='piece', price=645, tier='premium'),
+                Material(category='Electrical', subcategory='Downlights', name='12W', brand='Phillips', unit='piece', price=689, tier='premium'),
+                Material(category='Electrical', subcategory='Downlights', name='12W', brand='Orient', unit='piece', price=345, tier='eco'),
+                Material(category='Electrical', subcategory='Downlights', name='15W', brand='Jaguar', unit='piece', price=719, tier='premium'),
+                Material(category='Electrical', subcategory='Downlights', name='15W', brand='Phillips', unit='piece', price=749, tier='premium'),
+                Material(category='Electrical', subcategory='Downlights', name='15W', brand='Orient', unit='piece', price=399, tier='eco'),
+                
+                # Fans
+                Material(category='Electrical', subcategory='Fans', name='48-inch', brand='Crompton', unit='piece', price=2679, tier='premium'),
+                Material(category='Electrical', subcategory='Fans', name='48-inch', brand='Havells', unit='piece', price=2129, tier='standard'),
+                Material(category='Electrical', subcategory='Fans', name='48-inch', brand='Orient', unit='piece', price=1499, tier='eco'),
+                
+                # Fall Ceiling Data
+                # Interior
+                Material(category='Fall Ceiling', subcategory='Interior', name='PVC', brand='', unit='sq ft', price=200, tier='standard'),
+                Material(category='Fall Ceiling', subcategory='Interior', name='WPC', brand='', unit='sq ft', price=220, tier='premium'),
+                Material(category='Fall Ceiling', subcategory='Interior', name='Gypsum', brand='', unit='sq ft', price=110, tier='eco'),
+                Material(category='Fall Ceiling', subcategory='Interior', name='Cement Board', brand='', unit='sq ft', price=110, tier='standard'),
+                
+                # Exterior
+                Material(category='Fall Ceiling', subcategory='Exterior', name='Cement Board', brand='', unit='sq ft', price=110, tier='standard'),
+                Material(category='Fall Ceiling', subcategory='Exterior', name='ACP', brand='', unit='sq ft', price=150, tier='standard'),
+                Material(category='Fall Ceiling', subcategory='Exterior', name='HPL', brand='', unit='sq ft', price=550, tier='premium'),
+                
+                # Plumbing Materials
+                Material(category='Plumbing', subcategory='Pipes', name='PVC Pipe 1/2 inch', brand='Astral', unit='meter', price=45, tier='standard'),
+                Material(category='Plumbing', subcategory='Pipes', name='PVC Pipe 3/4 inch', brand='Astral', unit='meter', price=65, tier='standard'),
+                Material(category='Plumbing', subcategory='Pipes', name='PVC Pipe 1 inch', brand='Astral', unit='meter', price=85, tier='standard'),
+                Material(category='Plumbing', subcategory='Pipes', name='CPVC Pipe 1/2 inch', brand='Astral', unit='meter', price=75, tier='premium'),
+                Material(category='Plumbing', subcategory='Pipes', name='CPVC Pipe 3/4 inch', brand='Astral', unit='meter', price=95, tier='premium'),
+                
+                # Paint Materials
+                Material(category='Paint', subcategory='Interior', name='Emulsion Paint', brand='Asian Paints', unit='liter', price=450, tier='premium'),
+                Material(category='Paint', subcategory='Interior', name='Emulsion Paint', brand='Berger', unit='liter', price=420, tier='standard'),
+                Material(category='Paint', subcategory='Interior', name='Emulsion Paint', brand='Nerolac', unit='liter', price=380, tier='eco'),
+                Material(category='Paint', subcategory='Exterior', name='Weather Shield', brand='Asian Paints', unit='liter', price=520, tier='premium'),
+                Material(category='Paint', subcategory='Exterior', name='Weather Shield', brand='Berger', unit='liter', price=480, tier='standard'),
+                
+                # Tiling Materials
+                Material(category='Tiling', subcategory='Floor Tiles', name='Vitrified Tiles 2x2', brand='Kajaria', unit='sq ft', price=85, tier='premium'),
+                Material(category='Tiling', subcategory='Floor Tiles', name='Vitrified Tiles 2x2', brand='Somany', unit='sq ft', price=75, tier='standard'),
+                Material(category='Tiling', subcategory='Floor Tiles', name='Ceramic Tiles 2x2', brand='Local', unit='sq ft', price=45, tier='eco'),
+                Material(category='Tiling', subcategory='Wall Tiles', name='Ceramic Wall Tiles', brand='Kajaria', unit='sq ft', price=65, tier='premium'),
+                Material(category='Tiling', subcategory='Wall Tiles', name='Ceramic Wall Tiles', brand='Somany', unit='sq ft', price=55, tier='standard'),
+                
+                # Kitchen Materials
+                Material(category='Kitchen', subcategory='Cabinets', name='Modular Kitchen', brand='Godrej', unit='sq ft', price=1200, tier='premium'),
+                Material(category='Kitchen', subcategory='Cabinets', name='Modular Kitchen', brand='Sleek', unit='sq ft', price=950, tier='standard'),
+                Material(category='Kitchen', subcategory='Cabinets', name='Basic Kitchen', brand='Local', unit='sq ft', price=650, tier='eco'),
+                Material(category='Kitchen', subcategory='Countertop', name='Granite Countertop', brand='', unit='sq ft', price=180, tier='standard'),
+                Material(category='Kitchen', subcategory='Countertop', name='Quartz Countertop', brand='', unit='sq ft', price=280, tier='premium'),
+                
+                # Windows Materials
+                Material(category='Windows', subcategory='Sliding', name='Aluminum Sliding Window', brand='Fenesta', unit='sq ft', price=350, tier='premium', 
+                       labor_cost_percentage=15, tips='Premium aluminum windows offer better durability and weather resistance.'),
+                Material(category='Windows', subcategory='Sliding', name='Aluminum Sliding Window', brand='Standard', unit='sq ft', price=250, tier='standard', 
                        labor_cost_percentage=15, tips='Ensure proper sealing around the frame to prevent water leakage.'),
-                Material(category='Windows', subcategory='Sliding', name='Sliding Window', brand='Economy', unit='sq ft', price=180, tier='eco', 
+                Material(category='Windows', subcategory='Sliding', name='Basic Sliding Window', brand='Local', unit='sq ft', price=180, tier='eco', 
                        labor_cost_percentage=15, tips='Economy windows may have thinner frames and glass.'),
-                Material(category='Windows', subcategory='Sliding', name='Sliding Window', brand='Premium', unit='sq ft', price=350, tier='premium', 
-                       labor_cost_percentage=20, tips='Premium windows offer better insulation and noise reduction.'),
+                Material(category='Windows', subcategory='Casement', name='UPVC Casement Window', brand='Fenesta', unit='sq ft', price=450, tier='premium', 
+                       labor_cost_percentage=20, tips='UPVC windows offer excellent insulation and are maintenance-free.'),
+                Material(category='Windows', subcategory='Casement', name='Aluminum Casement Window', brand='Standard', unit='sq ft', price=320, tier='standard', 
+                       labor_cost_percentage=18, tips='Casement windows provide better ventilation than sliding windows.'),
                 
+                # Doors Materials
+                Material(category='Doors', subcategory='Main Door', name='Teak Wood Door', brand='Premium', unit='piece', price=25000, tier='premium', 
+                       labor_cost_percentage=15, tips='Teak wood offers excellent durability and natural resistance to weather.'),
                 Material(category='Doors', subcategory='Main Door', name='Solid Wood Door', brand='Standard', unit='piece', price=12000, tier='standard', 
                        labor_cost_percentage=10, tips='Treat wood doors with anti-termite solution before installation.'),
                 Material(category='Doors', subcategory='Main Door', name='Engineered Wood Door', brand='Economy', unit='piece', price=8000, tier='eco', 
                        labor_cost_percentage=10, tips='Engineered wood is more resistant to warping than solid wood.'),
-                Material(category='Doors', subcategory='Main Door', name='Teak Wood Door', brand='Premium', unit='piece', price=25000, tier='premium', 
-                       labor_cost_percentage=15, tips='Teak wood offers excellent durability and natural resistance to weather.')
+                Material(category='Doors', subcategory='Interior Door', name='Flush Door with Laminate', brand='Standard', unit='piece', price=4500, tier='standard', 
+                       labor_cost_percentage=8, tips='Flush doors are cost-effective for interior use.'),
+                Material(category='Doors', subcategory='Interior Door', name='Panel Door', brand='Premium', unit='piece', price=7500, tier='premium', 
+                       labor_cost_percentage=12, tips='Panel doors offer better aesthetics and ventilation.'),
+                
+                # Sanitation Materials
+                Material(category='Sanitation', subcategory='Toilet', name='Wall Hung Toilet', brand='Kohler', unit='piece', price=15000, tier='premium'),
+                Material(category='Sanitation', subcategory='Toilet', name='One Piece Toilet', brand='Hindware', unit='piece', price=8500, tier='standard'),
+                Material(category='Sanitation', subcategory='Toilet', name='Two Piece Toilet', brand='Parryware', unit='piece', price=5500, tier='eco'),
+                Material(category='Sanitation', subcategory='Basin', name='Table Top Basin', brand='Kohler', unit='piece', price=8500, tier='premium'),
+                Material(category='Sanitation', subcategory='Basin', name='Wall Hung Basin', brand='Hindware', unit='piece', price=4500, tier='standard'),
+                Material(category='Sanitation', subcategory='Basin', name='Pedestal Basin', brand='Parryware', unit='piece', price=2800, tier='eco'),
+                
+                # Steel Roofing Materials
+                Material(category='Steel Roofing', subcategory='Sheets', name='Galvanized Steel Sheet', brand='Tata', unit='sq ft', price=85, tier='premium'),
+                Material(category='Steel Roofing', subcategory='Sheets', name='Color Coated Sheet', brand='JSW', unit='sq ft', price=95, tier='premium'),
+                Material(category='Steel Roofing', subcategory='Sheets', name='Basic Steel Sheet', brand='Local', unit='sq ft', price=65, tier='eco'),
+                
+                # Furniture Materials
+                Material(category='Furniture', subcategory='Bedroom', name='Wardrobe', brand='Godrej', unit='piece', price=35000, tier='premium'),
+                Material(category='Furniture', subcategory='Bedroom', name='Wardrobe', brand='Nilkamal', unit='piece', price=22000, tier='standard'),
+                Material(category='Furniture', subcategory='Bedroom', name='Basic Wardrobe', brand='Local', unit='piece', price=15000, tier='eco'),
+                Material(category='Furniture', subcategory='Living Room', name='Sofa Set', brand='Durian', unit='set', price=45000, tier='premium'),
+                Material(category='Furniture', subcategory='Living Room', name='Sofa Set', brand='Hometown', unit='set', price=28000, tier='standard'),
+                
+                # Solar Materials
+                Material(category='Solar', subcategory='Panels', name='Solar Panel 320W', brand='Tata Power', unit='piece', price=12000, tier='premium'),
+                Material(category='Solar', subcategory='Panels', name='Solar Panel 320W', brand='Luminous', unit='piece', price=10500, tier='standard'),
+                Material(category='Solar', subcategory='Inverter', name='Solar Inverter 5KW', brand='Luminous', unit='piece', price=45000, tier='standard'),
+                
+                # HVAC Materials
+                Material(category='HVAC', subcategory='Air Conditioner', name='Split AC 1.5 Ton', brand='Daikin', unit='piece', price=45000, tier='premium'),
+                Material(category='HVAC', subcategory='Air Conditioner', name='Split AC 1.5 Ton', brand='LG', unit='piece', price=38000, tier='standard'),
+                Material(category='HVAC', subcategory='Air Conditioner', name='Window AC 1.5 Ton', brand='Voltas', unit='piece', price=28000, tier='eco'),
+                
+                # Waterproofing Materials
+                Material(category='Waterproofing', subcategory='Membrane', name='APP Membrane', brand='Fosroc', unit='sq ft', price=85, tier='premium'),
+                Material(category='Waterproofing', subcategory='Membrane', name='SBS Membrane', brand='MYK Laticrete', unit='sq ft', price=75, tier='standard'),
+                Material(category='Waterproofing', subcategory='Coating', name='Acrylic Coating', brand='Dr. Fixit', unit='sq ft', price=45, tier='eco'),
             ]
             for material in materials:
                 db.session.add(material)
