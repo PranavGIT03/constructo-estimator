@@ -242,7 +242,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     <div class="mt-4">
                         <button class="btn btn-success" onclick="window.print()">Download Estimate</button>
-                        <button class="btn btn-primary" onclick="subscribeForDetails(${result.id})">Subscribe for Detailed Breakdown</button>
+                        {% if current_user.subscription_type == 'premium' %}
+                            <button class="btn btn-primary" onclick="viewDetailedBOQ(${result.id})">View Detailed BOQ</button>
+                        {% else %}
+                            <button class="btn btn-primary" onclick="subscribeForDetails(${result.id})">Subscribe for Detailed Breakdown</button>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -257,6 +261,12 @@ document.addEventListener('DOMContentLoaded', function() {
         sessionStorage.setItem('pendingEstimateId', estimateId);
         // Redirect to subscription page
         window.location.href = '/subscription?redirect=detailed-boq';
+    };
+    
+    // Direct redirect to detailed BOQ for premium users
+    window.viewDetailedBOQ = function(estimateId) {
+        // Redirect directly to detailed BOQ with estimate data
+        window.location.href = `/detailed-boq?estimate=${estimateId}`;
     };
 });
 </script>
