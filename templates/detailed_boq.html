@@ -44,7 +44,8 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 id="categoryTitle">Civil Work</h5>
                 <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary active" data-tier="eco">Eco+</button>
+                    <button type="button" class="btn btn-outline-secondary active" data-tier="">All</button>
+                    <button type="button" class="btn btn-outline-secondary" data-tier="eco">Eco+</button>
                     <button type="button" class="btn btn-outline-secondary" data-tier="standard">Standard</button>
                     <button type="button" class="btn btn-outline-secondary" data-tier="premium">Premium</button>
                 </div>
@@ -95,7 +96,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let currentCategory = 'Civil Work';
-    let currentTier = 'eco';
+    let currentTier = '';
     let currentSubcategory = '';
     let estimateData = null;
     

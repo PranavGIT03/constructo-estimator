@@ -376,7 +376,7 @@ def get_materials():
     if tier:
         query = query.filter(Material.tier == tier)
     
-    materials = query.all()
+    materials = query.order_by(Material.subcategory, Material.name, Material.brand).all()
     
     return jsonify([{
         'id': m.id,
@@ -387,8 +387,20 @@ def get_materials():
         'unit': m.unit,
         'price': m.price,
         'tier': m.tier,
-        'labor_cost_percentage': m.labor_cost_percentage,
-        'tips': m.tips
+        'labor_cost_percentage': m.labor_cost_percentage or 0,
+        'tips': m.tips or ''
+    } for m in materials])
+
+@app.route('/api/materials/test')
+def test_materials():
+    materials = Material.query.limit(10).all()
+    return jsonify([{
+        'id': m.id,
+        'category': m.category,
+        'subcategory': m.subcategory,
+        'name': m.name,
+        'brand': m.brand,
+        'tier': m.tier
     } for m in materials])
 
 @app.route('/api/categories')
