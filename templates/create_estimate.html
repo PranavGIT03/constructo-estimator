@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     <div class="mt-4">
                         <button class="btn btn-success" onclick="window.print()">Download Estimate</button>
-                        <a href="/subscription" class="btn btn-primary">Subscribe for Detailed Breakdown</a>
+                        <button class="btn btn-primary" onclick="subscribeForDetails(${result.id})">Subscribe for Detailed Breakdown</button>
                     </div>
                 </div>
             </div>
@@ -250,6 +250,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.getElementById('estimateResult').innerHTML = html;
     }
+    
+    // Store estimate data and redirect to subscription
+    window.subscribeForDetails = function(estimateId) {
+        // Store the estimate ID in sessionStorage
+        sessionStorage.setItem('pendingEstimateId', estimateId);
+        // Redirect to subscription page
+        window.location.href = '/subscription?redirect=detailed-boq';
+    };
 });
 </script>
 {% endblock %}

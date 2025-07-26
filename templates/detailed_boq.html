@@ -97,9 +97,47 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentCategory = 'Civil Work';
     let currentTier = 'eco';
     let currentSubcategory = '';
+    let estimateData = null;
+    
+    // Check if there's an estimate ID in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const estimateId = urlParams.get('estimate');
+    
+    if (estimateId) {
+        loadEstimateData(estimateId);
+    }
     
     // Load materials for the initial category
     loadMaterials(currentCategory, currentTier, currentSubcategory);
+    
+    // Function to load estimate data
+    async function loadEstimateData(estimateId) {
+        try {
+            const response = await fetch(`/api/estimate/${estimateId}`);
+            if (response.ok) {
+                estimateData = await response.json();
+                
+                // Show estimate information at the top
+                const estimateInfo = document.createElement('div');
+                estimateInfo.className = 'alert alert-info mb-4';
+                estimateInfo.innerHTML = `
+                    <h5>Estimate Details</h5>
+                    <p><strong>Plot Area:</strong> ${estimateData.plot_area} sq ft | 
+                       <strong>Built-up Area:</strong> ${estimateData.built_up_area} sq ft | 
+                       <strong>Floors:</strong> ${estimateData.floors} | 
+                       <strong>Bedrooms:</strong> ${estimateData.bedrooms} | 
+                       <strong>Bathrooms:</strong> ${estimateData.bathrooms}</p>
+                    <p><strong>Total Cost:</strong> ₹${estimateData.total_cost.toLocaleString('en-IN')}</p>
+                `;
+                
+                // Insert at the top of the content
+                const content = document.querySelector('.row.mb-4');
+                content.parentNode.insertBefore(estimateInfo, content);
+            }
+        } catch (error) {
+            console.error('Error loading estimate data:', error);
+        }
+    }
     
     // Category selection
     document.querySelectorAll('.list-group-item').forEach(item => {

@@ -356,7 +356,8 @@ def get_sample_plan(plan_id):
 @app.route('/detailed-boq')
 @login_required
 def detailed_boq():
-    return render_template('detailed_boq.html')
+    estimate_id = request.args.get('estimate')
+    return render_template('detailed_boq.html', estimate_id=estimate_id)
 
 @app.route('/api/materials')
 def get_materials():

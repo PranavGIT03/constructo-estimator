@@ -108,7 +108,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (response.ok) {
                     alert('Subscription upgraded successfully! You now have premium access.');
-                    window.location.reload();
+                    
+                    // Check if there's a redirect parameter
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirect = urlParams.get('redirect');
+                    const estimateId = sessionStorage.getItem('pendingEstimateId');
+                    
+                    if (redirect === 'detailed-boq' && estimateId) {
+                        // Clear the stored estimate ID
+                        sessionStorage.removeItem('pendingEstimateId');
+                        // Redirect to detailed BOQ with the estimate data
+                        window.location.href = `/detailed-boq?estimate=${estimateId}`;
+                    } else {
+                        window.location.reload();
+                    }
                 } else {
                     alert('Error: ' + (result.error || 'An error occurred while upgrading your subscription.'));
                 }
