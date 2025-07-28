@@ -493,8 +493,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     html += `
                         <tr data-material-id="${material.id}">
-                            <td>${material.brand || '-'}</td>
                             <td>${index === 0 ? material.name : ''}</td>
+                            <td>${material.brand || '-'}</td>
                             <td>${material.unit}</td>
                             <td>${material.price.toLocaleString('en-IN')}</td>
                             ${isPremium ? `<td>${laborCost.toLocaleString('en-IN')}</td>` : ''}
