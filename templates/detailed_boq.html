@@ -292,6 +292,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentSubcategory = 'Cement';
             } else if (currentCategory === 'Paint') {
                 currentSubcategory = 'Exterior Paints';
+            } else if (currentCategory === 'Plumbing') {
+                currentSubcategory = 'CPVC Pipe';
             } else {
                 currentSubcategory = '';
             }
@@ -408,7 +410,8 @@ document.addEventListener('DOMContentLoaded', function() {
             subcategories.forEach(subcategory => {
                 const isActive = ((subcategory === 'MS Box' && currentSubcategory === 'MS Box') || 
                                  (subcategory === 'Cement' && currentSubcategory === 'Cement') ||
-                                 (subcategory === 'Exterior Paints' && currentSubcategory === 'Exterior Paints')) ? 'active' : '';
+                                 (subcategory === 'Exterior Paints' && currentSubcategory === 'Exterior Paints') ||
+                                 (subcategory === 'CPVC Pipe' && currentSubcategory === 'CPVC Pipe')) ? 'active' : '';
                 html += `
                     <button type="button" class="btn btn-sm btn-outline-secondary ${isActive}" data-subcategory="${subcategory}">${subcategory}</button>
                 `;
