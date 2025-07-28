@@ -64,8 +64,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
         <div class="container-fluid">
             {% if current_user.is_authenticated %}
-            <button class="btn btn-outline-light me-2" id="sidebarToggle" type="button">
-                <span style="display: inline-block; width: 1em; height: 1em; background-image: url('data:image/svg+xml;charset=utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><path stroke="rgba(255,255,255,0.8)" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"/></svg>');"></span>
+            <button class="btn btn-outline-light me-2" id="sidebarToggle" type="button" style="border: none; padding: 8px 12px;">
+                <div style="width: 20px; height: 2px; background-color: white; margin: 3px 0;"></div>
+                <div style="width: 20px; height: 2px; background-color: white; margin: 3px 0;"></div>
+                <div style="width: 20px; height: 2px; background-color: white; margin: 3px 0;"></div>
             </button>
             {% endif %}
             <a class="navbar-brand" href="/">Constructo</a>
