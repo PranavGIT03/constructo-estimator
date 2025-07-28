@@ -398,6 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let html = `
                 <label>Filter by Subcategory:</label>
                 <div class="btn-group mb-3" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-subcategory="">All</button>
             `;
             
             subcategories.forEach(subcategory => {
@@ -407,9 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             });
             
-            html += `
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-subcategory="">All</button>
-                </div>`;
+            html += `</div>`;
             
             container.innerHTML = html;
             
