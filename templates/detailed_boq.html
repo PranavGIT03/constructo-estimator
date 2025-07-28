@@ -397,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             
             subcategories.forEach(subcategory => {
-                const isActive = subcategory === 'MS Box' ? 'active' : '';
+                const isActive = (subcategory === 'MS Box' && currentSubcategory === 'MS Box') ? 'active' : '';
                 html += `
                     <button type="button" class="btn btn-sm btn-outline-secondary ${isActive}" data-subcategory="${subcategory}">${subcategory}</button>
                 `;
@@ -420,11 +420,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Update current subcategory
                     currentSubcategory = this.getAttribute('data-subcategory');
-                    
-                    // If switching to All, reset currentSubcategory to empty
-                    if (currentSubcategory === '') {
-                        currentSubcategory = '';
-                    }
                     
                     // Load materials for the selected subcategory
                     loadMaterials(currentCategory, currentTier, currentSubcategory);
