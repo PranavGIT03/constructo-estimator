@@ -3,6 +3,26 @@
 {% block content %}
 <h2>Detailed BOQ + Product Selector</h2>
 
+<!-- Progress Bar -->
+<div class="progress-container mb-4">
+    <div class="progress">
+        <div id="boq-progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+    </div>
+    <p class="text-center mt-2" id="boq-progress-text">0 of 15 categories completed</p>
+</div>
+
+<!-- Current Estimate Summary -->
+<div class="card mb-4" id="currentEstimate" style="display: none;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>Current Estimate</h5>
+        <button class="btn btn-success btn-sm" id="downloadExcel">Download Excel</button>
+    </div>
+    <div class="card-body">
+        <div id="estimateBreakdown"></div>
+        <h4 id="totalEstimate">Total: ₹0</h4>
+    </div>
+</div>
+
 <div class="row mb-4">
     <div class="col-md-12">
         <div class="alert alert-info">
@@ -203,6 +223,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentTier = '';
     let currentSubcategory = '';
     let estimateData = null;
+    let selectedMaterials = {}; // Track selected materials by category
+    let visitedCategories = new Set(); // Track visited categories
     
     // Check if there's an estimate ID in the URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -258,6 +280,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update current category
             currentCategory = this.getAttribute('data-category');
             document.getElementById('categoryTitle').textContent = currentCategory;
+            
+            // Mark category as visited
+            visitedCategories.add(currentCategory);
             
             // Reset subcategory
             currentSubcategory = '';
@@ -425,6 +450,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <th>Unit</th>
                             <th>Price (₹)</th>
                             ${isPremium ? '<th>Labor Cost</th>' : ''}
+                            <th>Select</th>
                             ${isPremium ? '<th>Actions</th>' : ''}
                         </tr>
                     </thead>
@@ -441,6 +467,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${material.unit}</td>
                     <td>${material.price.toLocaleString('en-IN')}</td>
                     ${isPremium ? `<td>${laborCost.toLocaleString('en-IN')}</td>` : ''}
+                    <td>
+                        <button class="btn btn-sm btn-primary select-material" 
+                                data-material-id="${material.id}" 
+                                data-category="${material.category}"
+                                data-name="${material.name}"
+                                data-brand="${material.brand || ''}"
+                                data-price="${material.price}"
+                                data-tier="${material.tier}">
+                            Select
+                        </button>
+                    </td>
                     ${isPremium ? `
                         <td>
                             <button class="btn btn-sm btn-info view-tips" data-material-id="${material.id}">
@@ -480,7 +517,113 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
         }
+        
+        // Add event listeners to select buttons
+        document.querySelectorAll('.select-material').forEach(button => {
+            button.addEventListener('click', function() {
+                const materialId = this.getAttribute('data-material-id');
+                const category = this.getAttribute('data-category');
+                const name = this.getAttribute('data-name');
+                const brand = this.getAttribute('data-brand');
+                const price = parseFloat(this.getAttribute('data-price'));
+                const tier = this.getAttribute('data-tier');
+                
+                // Update selected materials
+                selectedMaterials[category] = {
+                    id: materialId,
+                    name: name,
+                    brand: brand,
+                    price: price,
+                    tier: tier
+                };
+                
+                // Update button states
+                document.querySelectorAll(`[data-category="${category}"] .select-material`).forEach(btn => {
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-primary');
+                    btn.textContent = 'Select';
+                });
+                
+                this.classList.remove('btn-primary');
+                this.classList.add('btn-success');
+                this.textContent = 'Selected';
+                
+                // Update estimate
+                updateEstimate();
+            });
+        });
     }
+    
+    function updateEstimate() {
+        const estimateCard = document.getElementById('currentEstimate');
+        const breakdown = document.getElementById('estimateBreakdown');
+        const total = document.getElementById('totalEstimate');
+        
+        if (Object.keys(selectedMaterials).length === 0) {
+            estimateCard.style.display = 'none';
+            return;
+        }
+        
+        estimateCard.style.display = 'block';
+        
+        let totalCost = 0;
+        let html = '<div class="row">';
+        
+        for (const [category, material] of Object.entries(selectedMaterials)) {
+            const cost = material.price * 100; // Assuming 100 sq ft base calculation
+            totalCost += cost;
+            
+            html += `
+                <div class="col-md-6 mb-2">
+                    <strong>${category}:</strong> ${material.name} ${material.brand ? `(${material.brand})` : ''} - ₹${cost.toLocaleString('en-IN')}
+                </div>
+            `;
+        }
+        
+        html += '</div>';
+        breakdown.innerHTML = html;
+        total.textContent = `Total: ₹${totalCost.toLocaleString('en-IN')}`;
+        
+        updateProgress();
+    }
+    
+    function updateProgress() {
+        const totalCategories = 15;
+        const completedCategories = Object.keys(selectedMaterials).length;
+        const percentage = Math.round((completedCategories / totalCategories) * 100);
+        
+        const progressBar = document.getElementById('boq-progress-bar');
+        const progressText = document.getElementById('boq-progress-text');
+        
+        progressBar.style.width = `${percentage}%`;
+        progressBar.setAttribute('aria-valuenow', percentage);
+        progressBar.textContent = `${percentage}%`;
+        progressText.textContent = `${completedCategories} of ${totalCategories} categories completed`;
+    }
+    
+    // Download Excel functionality
+    document.getElementById('downloadExcel').addEventListener('click', function() {
+        if (Object.keys(selectedMaterials).length === 0) {
+            alert('Please select materials before downloading');
+            return;
+        }
+        
+        // Create CSV content
+        let csvContent = 'Category,Product,Brand,Price,Tier\n';
+        
+        for (const [category, material] of Object.entries(selectedMaterials)) {
+            csvContent += `"${category}","${material.name}","${material.brand}","${material.price}","${material.tier}"\n`;
+        }
+        
+        // Download CSV file
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'boq_estimate.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    });
     
     // Windows Calculator Functions
     function initWindowsCalculator() {

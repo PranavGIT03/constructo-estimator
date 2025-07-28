@@ -470,6 +470,15 @@ def upgrade_subscription():
     
     return jsonify({'message': 'Subscription upgraded successfully'})
 
+@app.route('/api/downgrade-subscription', methods=['POST'])
+@login_required
+def downgrade_subscription():
+    current_user.subscription_type = 'free'
+    current_user.estimations_left = 3  # Reset to free limit
+    db.session.commit()
+    
+    return jsonify({'message': 'Subscription downgraded successfully'})
+
 # FAQ, Testimonials, Contact Routes
 @app.route('/faqs')
 def faqs():
