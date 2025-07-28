@@ -285,8 +285,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Mark category as visited
             visitedCategories.add(currentCategory);
             
-            // Reset subcategory
-            currentSubcategory = '';
+            // Reset subcategory - set MS Box as default for Electrical
+            if (currentCategory === 'Electrical') {
+                currentSubcategory = 'MS Box';
+            } else {
+                currentSubcategory = '';
+            }
             
             // Show specialized calculators for Windows and Doors
             if (currentCategory === 'Windows') {
