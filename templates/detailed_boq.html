@@ -460,8 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Brand</th>
-                            <th>Name</th>
+                            ${currentCategory === 'Plumbing' ? '<th>Name</th><th>Brand</th>' : '<th>Brand</th><th>Name</th>'}
                             <th>Unit</th>
                             <th>Price (₹)</th>
                             ${isPremium ? '<th>Labor Cost</th>' : ''}
