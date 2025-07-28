@@ -267,11 +267,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('materialsContainer').style.display = 'none';
                 document.getElementById('doorsCalculator').style.display = 'none';
                 document.getElementById('windowsCalculator').style.display = 'block';
+                document.getElementById('subcategoryFilter').innerHTML = ''; // Clear subcategory filter
                 initWindowsCalculator();
             } else if (currentCategory === 'Doors') {
                 document.getElementById('materialsContainer').style.display = 'none';
                 document.getElementById('windowsCalculator').style.display = 'none';
                 document.getElementById('doorsCalculator').style.display = 'block';
+                document.getElementById('subcategoryFilter').innerHTML = ''; // Clear subcategory filter
                 initDoorsCalculator();
             } else {
                 document.getElementById('windowsCalculator').style.display = 'none';
