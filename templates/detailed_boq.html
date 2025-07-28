@@ -11,18 +11,6 @@
     <p class="text-center mt-2" id="boq-progress-text">0 of 15 categories completed</p>
 </div>
 
-<!-- Current Estimate Summary -->
-<div class="card mb-4" id="currentEstimate" style="display: none;">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5>Current Estimate</h5>
-        <button class="btn btn-success btn-sm" id="downloadExcel">Download Excel</button>
-    </div>
-    <div class="card-body">
-        <div id="estimateBreakdown"></div>
-        <h4 id="totalEstimate">Total: ₹0</h4>
-    </div>
-</div>
-
 <div class="row mb-4">
     <div class="col-md-12">
         <div class="alert alert-info">
@@ -201,6 +189,18 @@
                     <a href="/subscription" class="btn btn-primary">Upgrade to Premium</a>
                 </div>
                 {% endif %}
+            </div>
+        </div>
+        
+        <!-- Current Estimate Summary -->
+        <div class="card mt-4" id="currentEstimate" style="display: none;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Current Estimate</h5>
+                <button class="btn btn-success btn-sm" id="downloadExcel">Download Excel</button>
+            </div>
+            <div class="card-body">
+                <div id="estimateBreakdown"></div>
+                <h4 id="totalEstimate">Total: ₹0</h4>
             </div>
         </div>
         
