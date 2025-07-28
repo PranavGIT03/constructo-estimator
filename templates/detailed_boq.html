@@ -460,8 +460,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Name</th>
                             <th>Brand</th>
+                            <th>Name</th>
                             <th>Unit</th>
                             <th>Price (₹)</th>
                             ${isPremium ? '<th>Labor Cost</th>' : ''}
@@ -472,33 +472,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     <tbody>
         `;
         
-        // Group materials by name to show item name only once
+        // Group materials by brand to show brand name only once
         const groupedMaterials = {};
         materials.forEach(material => {
-            if (!groupedMaterials[material.name]) {
-                groupedMaterials[material.name] = [];
+            const brandKey = material.brand || 'No Brand';
+            if (!groupedMaterials[brandKey]) {
+                groupedMaterials[brandKey] = [];
             }
-            groupedMaterials[material.name].push(material);
+            groupedMaterials[brandKey].push(material);
         });
         
-        Object.keys(groupedMaterials).forEach(itemName => {
-            const itemMaterials = groupedMaterials[itemName].sort((a, b) => {
-                // Sort by brand, putting empty brands last
-                if (!a.brand && !b.brand) return 0;
-                if (!a.brand) return 1;
-                if (!b.brand) return -1;
-                return a.brand.localeCompare(b.brand);
-            });
+        // Sort brands alphabetically, with 'No Brand' last
+        const sortedBrands = Object.keys(groupedMaterials).sort((a, b) => {
+            if (a === 'No Brand' && b === 'No Brand') return 0;
+            if (a === 'No Brand') return 1;
+            if (b === 'No Brand') return -1;
+            return a.localeCompare(b);
+        });
+        
+        sortedBrands.forEach(brandKey => {
+            const brandMaterials = groupedMaterials[brandKey];
             
-            itemMaterials.forEach((material, index) => {
+            brandMaterials.forEach((material, index) => {
                 const laborCost = material.price * (material.labor_cost_percentage / 100);
                 const selectionKey = `${material.category}-${material.subcategory || 'default'}`;
                 const isSelected = selectedMaterials[selectionKey] && selectedMaterials[selectionKey].id == material.id;
                 
                 html += `
                     <tr data-material-id="${material.id}">
-                        <td>${index === 0 ? material.name : ''}</td>
-                        <td>${material.brand || '-'}</td>
+                        <td>${index === 0 ? (material.brand || '-') : ''}</td>
+                        <td>${material.name}</td>
                         <td>${material.unit}</td>
                         <td>${material.price.toLocaleString('en-IN')}</td>
                         ${isPremium ? `<td>${laborCost.toLocaleString('en-IN')}</td>` : ''}
