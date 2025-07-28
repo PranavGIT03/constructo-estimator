@@ -491,7 +491,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         sortedBrands.forEach(brandKey => {
-            const brandMaterials = groupedMaterials[brandKey];
+            const brandMaterials = groupedMaterials[brandKey].sort((a, b) => a.price - b.price);
             
             brandMaterials.forEach((material, index) => {
                 const laborCost = material.price * (material.labor_cost_percentage / 100);
