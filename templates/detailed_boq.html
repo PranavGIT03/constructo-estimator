@@ -482,7 +482,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         Object.keys(groupedMaterials).forEach(itemName => {
-            const itemMaterials = groupedMaterials[itemName];
+            const itemMaterials = groupedMaterials[itemName].sort((a, b) => {
+                // Sort by brand, putting empty brands last
+                if (!a.brand && !b.brand) return 0;
+                if (!a.brand) return 1;
+                if (!b.brand) return -1;
+                return a.brand.localeCompare(b.brand);
+            });
             
             itemMaterials.forEach((material, index) => {
                 const laborCost = material.price * (material.labor_cost_percentage / 100);
