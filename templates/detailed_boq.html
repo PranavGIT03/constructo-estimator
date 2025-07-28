@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentTier = '';
     let currentSubcategory = '';
     let estimateData = null;
-    let selectedMaterials = {}; // Track selected materials by category
+    let selectedMaterials = {}; // Track selected materials by category-subcategory
     let visitedCategories = new Set(); // Track visited categories
     
     // Check if there's an estimate ID in the URL
@@ -471,6 +471,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <button class="btn btn-sm btn-primary select-material" 
                                 data-material-id="${material.id}" 
                                 data-category="${material.category}"
+                                data-subcategory="${material.subcategory || ''}"
                                 data-name="${material.name}"
                                 data-brand="${material.brand || ''}"
                                 data-price="${material.price}"
@@ -523,34 +524,50 @@ document.addEventListener('DOMContentLoaded', function() {
             button.addEventListener('click', function() {
                 const materialId = this.getAttribute('data-material-id');
                 const category = this.getAttribute('data-category');
+                const subcategory = this.getAttribute('data-subcategory') || 'default';
                 const name = this.getAttribute('data-name');
                 const brand = this.getAttribute('data-brand');
                 const price = parseFloat(this.getAttribute('data-price'));
                 const tier = this.getAttribute('data-tier');
                 
+                const selectionKey = `${category}-${subcategory}`;
+                
                 // Check if this material is already selected
                 if (this.classList.contains('btn-success')) {
                     // Unselect the material
-                    delete selectedMaterials[category];
+                    delete selectedMaterials[selectionKey];
                     this.classList.remove('btn-success');
                     this.classList.add('btn-primary');
                     this.textContent = 'Select';
                 } else {
-                    // Select the material
-                    selectedMaterials[category] = {
+                    // Select the material and deselect others in same subcategory
+                    selectedMaterials[selectionKey] = {
                         id: materialId,
+                        category: category,
+                        subcategory: subcategory,
                         name: name,
                         brand: brand,
                         price: price,
                         tier: tier
                     };
                     
-                    // Update button states for this category
-                    document.querySelectorAll(`[data-category="${category}"] .select-material`).forEach(btn => {
+                    // Update button states for this subcategory (deselect all others)
+                    document.querySelectorAll(`[data-category="${category}"][data-subcategory="${subcategory}"] .select-material`).forEach(btn => {
                         btn.classList.remove('btn-success');
                         btn.classList.add('btn-primary');
                         btn.textContent = 'Select';
                     });
+                    
+                    // If no subcategory attribute, fall back to category-wide deselection
+                    if (!this.getAttribute('data-subcategory')) {
+                        document.querySelectorAll(`[data-category="${category}"] .select-material`).forEach(btn => {
+                            if (!btn.getAttribute('data-subcategory')) {
+                                btn.classList.remove('btn-success');
+                                btn.classList.add('btn-primary');
+                                btn.textContent = 'Select';
+                            }
+                        });
+                    }
                     
                     this.classList.remove('btn-primary');
                     this.classList.add('btn-success');
@@ -578,13 +595,16 @@ document.addEventListener('DOMContentLoaded', function() {
         let totalCost = 0;
         let html = '<div class="row">';
         
-        for (const [category, material] of Object.entries(selectedMaterials)) {
+        for (const [key, material] of Object.entries(selectedMaterials)) {
             const cost = material.price * 100; // Assuming 100 sq ft base calculation
             totalCost += cost;
             
+            const displayName = material.subcategory !== 'default' ? 
+                `${material.category} - ${material.subcategory}` : material.category;
+            
             html += `
                 <div class="col-md-6 mb-2">
-                    <strong>${category}:</strong> ${material.name} ${material.brand ? `(${material.brand})` : ''} - ₹${cost.toLocaleString('en-IN')}
+                    <strong>${displayName}:</strong> ${material.name} ${material.brand ? `(${material.brand})` : ''} - ₹${cost.toLocaleString('en-IN')}
                 </div>
             `;
         }
