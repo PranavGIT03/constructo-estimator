@@ -117,7 +117,7 @@ def login():
         
         if user and check_password_hash(user.password, password):
             login_user(user)
-            return jsonify({'message': 'Login successful'}), 200
+            return jsonify({'message': 'Login successful', 'redirect': '/'}), 200
         
         return jsonify({'error': 'Invalid credentials'}), 401
     
