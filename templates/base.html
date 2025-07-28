@@ -63,6 +63,11 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
         <div class="container-fluid">
+            {% if current_user.is_authenticated %}
+            <button class="btn btn-outline-light me-2" id="sidebarToggle" type="button">
+                <span style="display: inline-block; width: 1em; height: 1em; background-image: url('data:image/svg+xml;charset=utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><path stroke="rgba(255,255,255,0.8)" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"/></svg>');"></span>
+            </button>
+            {% endif %}
             <a class="navbar-brand" href="/">Constructo</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -84,7 +89,7 @@
     <div class="container-fluid">
         <div class="row">
             {% if current_user.is_authenticated %}
-            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <nav id="sidebar" class="col-md-3 col-lg-2 sidebar collapse" style="display: none;">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -152,12 +157,34 @@
             </nav>
             {% endif %}
             
-            <main class="{% if current_user.is_authenticated %}col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content{% else %}col-12{% endif %}">
+            <main id="mainContent" class="{% if current_user.is_authenticated %}col-12 px-md-4{% else %}col-12{% endif %}">
                 <div class="container mt-5 pt-3">
                     {% block content %}{% endblock %}
                 </div>
             </main>
         </div>
     </div>
+    
+    {% if current_user.is_authenticated %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                if (sidebar.style.display === 'none') {
+                    sidebar.style.display = 'block';
+                    mainContent.className = 'col-md-9 ms-sm-auto col-lg-10 px-md-4';
+                } else {
+                    sidebar.style.display = 'none';
+                    mainContent.className = 'col-12 px-md-4';
+                }
+            });
+        }
+    });
+    </script>
+    {% endif %}
 </body>
 </html>

@@ -108,9 +108,9 @@
 
     <div class="row">
         <div class="col-md-6">
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="lift" name="lift">
-                <label class="form-check-label" for="lift">Include Lift</label>
+            <div class="mb-3">
+                <label for="lift" class="form-label">Number of Lifts</label>
+                <input type="number" class="form-control" id="lift" name="lift" min="0" max="5" value="0">
             </div>
         </div>
     </div>
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
             utility_rooms: parseInt(document.getElementById('utility_rooms').value),
             car_parking: parseInt(document.getElementById('car_parking').value),
             two_wheeler_parking: parseInt(document.getElementById('two_wheeler_parking').value),
-            lift: document.getElementById('lift').checked
+            lift: parseInt(document.getElementById('lift').value) || 0
         };
         
         try {
