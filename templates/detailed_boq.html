@@ -472,62 +472,113 @@ document.addEventListener('DOMContentLoaded', function() {
                     <tbody>
         `;
         
-        // Group materials by brand to show brand name only once
-        const groupedMaterials = {};
-        materials.forEach(material => {
-            const brandKey = material.brand || 'No Brand';
-            if (!groupedMaterials[brandKey]) {
-                groupedMaterials[brandKey] = [];
-            }
-            groupedMaterials[brandKey].push(material);
-        });
-        
-        // Sort brands alphabetically, with 'No Brand' last
-        const sortedBrands = Object.keys(groupedMaterials).sort((a, b) => {
-            if (a === 'No Brand' && b === 'No Brand') return 0;
-            if (a === 'No Brand') return 1;
-            if (b === 'No Brand') return -1;
-            return a.localeCompare(b);
-        });
-        
-        sortedBrands.forEach(brandKey => {
-            const brandMaterials = groupedMaterials[brandKey].sort((a, b) => a.price - b.price);
+        // Special handling for Plumbing - group by item name, others by brand
+        if (currentCategory === 'Plumbing') {
+            // Group by item name for Plumbing
+            const groupedMaterials = {};
+            materials.forEach(material => {
+                if (!groupedMaterials[material.name]) {
+                    groupedMaterials[material.name] = [];
+                }
+                groupedMaterials[material.name].push(material);
+            });
             
-            brandMaterials.forEach((material, index) => {
-                const laborCost = material.price * (material.labor_cost_percentage / 100);
-                const selectionKey = `${material.category}-${material.subcategory || 'default'}`;
-                const isSelected = selectedMaterials[selectionKey] && selectedMaterials[selectionKey].id == material.id;
+            Object.keys(groupedMaterials).sort().forEach(itemName => {
+                const itemMaterials = groupedMaterials[itemName].sort((a, b) => a.price - b.price);
                 
-                html += `
-                    <tr data-material-id="${material.id}">
-                        <td>${index === 0 ? (material.brand || '-') : ''}</td>
-                        <td>${material.name}</td>
-                        <td>${material.unit}</td>
-                        <td>${material.price.toLocaleString('en-IN')}</td>
-                        ${isPremium ? `<td>${laborCost.toLocaleString('en-IN')}</td>` : ''}
-                        <td>
-                            <button class="btn btn-sm ${isSelected ? 'btn-success' : 'btn-primary'} select-material" 
-                                    data-material-id="${material.id}" 
-                                    data-category="${material.category}"
-                                    data-subcategory="${material.subcategory || ''}"
-                                    data-name="${material.name}"
-                                    data-brand="${material.brand || ''}"
-                                    data-price="${material.price}"
-                                    data-tier="${material.tier}">
-                                ${isSelected ? 'Selected' : 'Select'}
-                            </button>
-                        </td>
-                        ${isPremium ? `
+                itemMaterials.forEach((material, index) => {
+                    const laborCost = material.price * (material.labor_cost_percentage / 100);
+                    const selectionKey = `${material.category}-${material.subcategory || 'default'}`;
+                    const isSelected = selectedMaterials[selectionKey] && selectedMaterials[selectionKey].id == material.id;
+                    
+                    html += `
+                        <tr data-material-id="${material.id}">
+                            <td>${material.brand || '-'}</td>
+                            <td>${index === 0 ? material.name : ''}</td>
+                            <td>${material.unit}</td>
+                            <td>${material.price.toLocaleString('en-IN')}</td>
+                            ${isPremium ? `<td>${laborCost.toLocaleString('en-IN')}</td>` : ''}
                             <td>
-                                <button class="btn btn-sm btn-info view-tips" data-material-id="${material.id}">
-                                    View Tips
+                                <button class="btn btn-sm ${isSelected ? 'btn-success' : 'btn-primary'} select-material" 
+                                        data-material-id="${material.id}" 
+                                        data-category="${material.category}"
+                                        data-subcategory="${material.subcategory || ''}"
+                                        data-name="${material.name}"
+                                        data-brand="${material.brand || ''}"
+                                        data-price="${material.price}"
+                                        data-tier="${material.tier}">
+                                    ${isSelected ? 'Selected' : 'Select'}
                                 </button>
                             </td>
-                        ` : ''}
-                    </tr>
-                `;
+                            ${isPremium ? `
+                                <td>
+                                    <button class="btn btn-sm btn-info view-tips" data-material-id="${material.id}">
+                                        View Tips
+                                    </button>
+                                </td>
+                            ` : ''}
+                        </tr>
+                    `;
+                });
             });
-        });
+        } else {
+            // Group by brand for other categories
+            const groupedMaterials = {};
+            materials.forEach(material => {
+                const brandKey = material.brand || 'No Brand';
+                if (!groupedMaterials[brandKey]) {
+                    groupedMaterials[brandKey] = [];
+                }
+                groupedMaterials[brandKey].push(material);
+            });
+            
+            // Sort brands alphabetically, with 'No Brand' last
+            const sortedBrands = Object.keys(groupedMaterials).sort((a, b) => {
+                if (a === 'No Brand' && b === 'No Brand') return 0;
+                if (a === 'No Brand') return 1;
+                if (b === 'No Brand') return -1;
+                return a.localeCompare(b);
+            });
+            
+            sortedBrands.forEach(brandKey => {
+                const brandMaterials = groupedMaterials[brandKey].sort((a, b) => a.price - b.price);
+                
+                brandMaterials.forEach((material, index) => {
+                    const laborCost = material.price * (material.labor_cost_percentage / 100);
+                    const selectionKey = `${material.category}-${material.subcategory || 'default'}`;
+                    const isSelected = selectedMaterials[selectionKey] && selectedMaterials[selectionKey].id == material.id;
+                    
+                    html += `
+                        <tr data-material-id="${material.id}">
+                            <td>${index === 0 ? (material.brand || '-') : ''}</td>
+                            <td>${material.name}</td>
+                            <td>${material.unit}</td>
+                            <td>${material.price.toLocaleString('en-IN')}</td>
+                            ${isPremium ? `<td>${laborCost.toLocaleString('en-IN')}</td>` : ''}
+                            <td>
+                                <button class="btn btn-sm ${isSelected ? 'btn-success' : 'btn-primary'} select-material" 
+                                        data-material-id="${material.id}" 
+                                        data-category="${material.category}"
+                                        data-subcategory="${material.subcategory || ''}"
+                                        data-name="${material.name}"
+                                        data-brand="${material.brand || ''}"
+                                        data-price="${material.price}"
+                                        data-tier="${material.tier}">
+                                    ${isSelected ? 'Selected' : 'Select'}
+                                </button>
+                            </td>
+                            ${isPremium ? `
+                                <td>
+                                    <button class="btn btn-sm btn-info view-tips" data-material-id="${material.id}">
+                                        View Tips
+                                    </button>
+                                </td>
+                            ` : ''}
+                        </tr>
+                    `;
+                });
+            });
+        }
         
         html += `
                     </tbody>
