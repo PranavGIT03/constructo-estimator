@@ -290,6 +290,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentSubcategory = 'MS Box';
             } else if (currentCategory === 'Civil Work') {
                 currentSubcategory = 'Cement';
+            } else if (currentCategory === 'Paint') {
+                currentSubcategory = 'Exterior Paints';
             } else {
                 currentSubcategory = '';
             }
@@ -405,7 +407,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             subcategories.forEach(subcategory => {
                 const isActive = ((subcategory === 'MS Box' && currentSubcategory === 'MS Box') || 
-                                 (subcategory === 'Cement' && currentSubcategory === 'Cement')) ? 'active' : '';
+                                 (subcategory === 'Cement' && currentSubcategory === 'Cement') ||
+                                 (subcategory === 'Exterior Paints' && currentSubcategory === 'Exterior Paints')) ? 'active' : '';
                 html += `
                     <button type="button" class="btn btn-sm btn-outline-secondary ${isActive}" data-subcategory="${subcategory}">${subcategory}</button>
                 `;
