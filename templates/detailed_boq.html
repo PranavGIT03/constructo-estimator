@@ -285,9 +285,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Mark category as visited
             visitedCategories.add(currentCategory);
             
-            // Reset subcategory - set MS Box as default for Electrical
+            // Reset subcategory - set defaults for categories with multiple subcategories
             if (currentCategory === 'Electrical') {
                 currentSubcategory = 'MS Box';
+            } else if (currentCategory === 'Civil Work') {
+                currentSubcategory = 'Cement';
             } else {
                 currentSubcategory = '';
             }
@@ -402,7 +404,8 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             
             subcategories.forEach(subcategory => {
-                const isActive = (subcategory === 'MS Box' && currentSubcategory === 'MS Box') ? 'active' : '';
+                const isActive = ((subcategory === 'MS Box' && currentSubcategory === 'MS Box') || 
+                                 (subcategory === 'Cement' && currentSubcategory === 'Cement')) ? 'active' : '';
                 html += `
                     <button type="button" class="btn btn-sm btn-outline-secondary ${isActive}" data-subcategory="${subcategory}">${subcategory}</button>
                 `;
