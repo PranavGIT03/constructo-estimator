@@ -64,6 +64,109 @@
                     </div>
                 </div>
                 
+                <!-- Windows Calculator -->
+                <div id="windowsCalculator" style="display: none;">
+                    <h6>Aluminium Windows Calculator</h6>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Length (ft)</label>
+                            <input type="number" id="windowLength" class="form-control" min="1" max="15" step="0.1">
+                        </div>
+                        <div class="col-md-2">
+                            <label>Width (ft)</label>
+                            <input type="number" id="windowWidth" class="form-control" min="1" max="15" step="0.1">
+                        </div>
+                        <div class="col-md-2">
+                            <label>Area (sq ft)</label>
+                            <input type="number" id="windowArea" class="form-control" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Type of Window</label>
+                            <select id="windowType" class="form-select">
+                                <option value="Sliding">Sliding</option>
+                                <option value="Panel">Panel</option>
+                                <option value="Tilt">Tilt</option>
+                                <option value="Tilt and Turn">Tilt and Turn</option>
+                                <option value="Fixed">Fixed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>Number of Windows</label>
+                            <input type="number" id="windowCount" class="form-control" min="1" value="1">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <label>Products</label>
+                            <div class="btn-group d-block" role="group">
+                                <button type="button" class="btn btn-outline-secondary" id="windowEco">Eco+ - ₹180/sq ft</button>
+                                <button type="button" class="btn btn-outline-secondary" id="windowStandard">Standard - ₹250/sq ft</button>
+                                <button type="button" class="btn btn-outline-secondary" id="windowPremium">Premium - ₹350/sq ft</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="windowWarning" class="alert alert-warning mt-3" style="display: none;"></div>
+                    <div id="windowResult" class="mt-3"></div>
+                </div>
+                
+                <!-- Doors Calculator -->
+                <div id="doorsCalculator" style="display: none;">
+                    <h6>Doors Calculator</h6>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Width (ft)</label>
+                            <input type="number" id="doorWidth" class="form-control" min="1" max="15" step="0.1">
+                        </div>
+                        <div class="col-md-3">
+                            <label>Height (ft)</label>
+                            <input type="number" id="doorHeight" class="form-control" min="1" max="15" step="0.1">
+                        </div>
+                        <div class="col-md-3">
+                            <label>Core Type</label>
+                            <select id="doorCore" class="form-select">
+                                <option value="">Select Core</option>
+                                <option value="Plywood">Plywood</option>
+                                <option value="BWP">BWP</option>
+                                <option value="MDHMR">MDHMR</option>
+                                <option value="Solid Wood">Solid Wood</option>
+                                <option value="Aluminium Frame">Aluminium Frame</option>
+                                <option value="Glass Door">Glass Door</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Finish Type</label>
+                            <select id="doorFinish" class="form-select">
+                                <option value="">Select Finish</option>
+                                <option value="Laminate">Laminate</option>
+                                <option value="MDF with Paint">MDF with Paint</option>
+                                <option value="Veneer with Paint">Veneer with Paint</option>
+                                <option value="PVC">PVC</option>
+                                <option value="Highlighters">Highlighters</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <label>Hardware</label>
+                            <select id="doorHardware" class="form-select">
+                                <option value="">Select Hardware</option>
+                                <option value="Hinges">Hinges</option>
+                                <option value="Floor Machine">Floor Machine</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Handle Type</label>
+                            <div class="btn-group d-block" role="group">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="handleEco">Eco+ (₹500)</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="handleStandard">Standard (₹2000)</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="handlePremium">Premium (₹10000)</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="doorWarning" class="alert alert-warning mt-3" style="display: none;"></div>
+                    <div id="doorResult" class="mt-3"></div>
+                </div>
+                
                 {% if current_user.subscription_type != 'premium' %}
                 <div class="mt-4 p-3 bg-light">
                     <h5>Premium Features</h5>
@@ -158,8 +261,24 @@ document.addEventListener('DOMContentLoaded', function() {
             // Reset subcategory
             currentSubcategory = '';
             
-            // Load materials for the selected category
-            loadMaterials(currentCategory, currentTier, currentSubcategory);
+            // Show specialized calculators for Windows and Doors
+            if (currentCategory === 'Windows') {
+                document.getElementById('materialsContainer').style.display = 'none';
+                document.getElementById('doorsCalculator').style.display = 'none';
+                document.getElementById('windowsCalculator').style.display = 'block';
+                initWindowsCalculator();
+            } else if (currentCategory === 'Doors') {
+                document.getElementById('materialsContainer').style.display = 'none';
+                document.getElementById('windowsCalculator').style.display = 'none';
+                document.getElementById('doorsCalculator').style.display = 'block';
+                initDoorsCalculator();
+            } else {
+                document.getElementById('windowsCalculator').style.display = 'none';
+                document.getElementById('doorsCalculator').style.display = 'none';
+                document.getElementById('materialsContainer').style.display = 'block';
+                // Load materials for the selected category
+                loadMaterials(currentCategory, currentTier, currentSubcategory);
+            }
         });
     });
     
@@ -350,6 +469,191 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
         }
+    }
+    
+    // Windows Calculator Functions
+    function initWindowsCalculator() {
+        const lengthInput = document.getElementById('windowLength');
+        const widthInput = document.getElementById('windowWidth');
+        const areaInput = document.getElementById('windowArea');
+        const typeSelect = document.getElementById('windowType');
+        const countInput = document.getElementById('windowCount');
+        const ecoBtn = document.getElementById('windowEco');
+        const standardBtn = document.getElementById('windowStandard');
+        const premiumBtn = document.getElementById('windowPremium');
+        
+        function calculateWindowArea() {
+            const length = parseFloat(lengthInput.value) || 0;
+            const width = parseFloat(widthInput.value) || 0;
+            const area = length * width;
+            areaInput.value = area.toFixed(2);
+            
+            checkWindowConstraints(length, width);
+        }
+        
+        function checkWindowConstraints(length, width) {
+            const warningDiv = document.getElementById('windowWarning');
+            const type = typeSelect.value;
+            
+            // Reset button states
+            [ecoBtn, standardBtn, premiumBtn].forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-outline-secondary');
+            });
+            
+            if (length > 8 || width > 8) {
+                if (type === 'Tilt and Turn') {
+                    warningDiv.innerHTML = 'Tilt and Turn windows not available for dimensions > 8 feet';
+                    warningDiv.style.display = 'block';
+                    return;
+                }
+                
+                if (length > 8 && width > 8) {
+                    // Only premium possible
+                    ecoBtn.disabled = true;
+                    standardBtn.disabled = true;
+                    ecoBtn.classList.add('btn-danger');
+                    standardBtn.classList.add('btn-danger');
+                    warningDiv.innerHTML = 'Only Premium option available for dimensions > 8ft x 8ft';
+                    warningDiv.style.display = 'block';
+                } else {
+                    warningDiv.innerHTML = 'Premium recommended for dimensions > 8 feet';
+                    warningDiv.style.display = 'block';
+                }
+            } else {
+                warningDiv.style.display = 'none';
+            }
+        }
+        
+        function calculateWindowCost(tier) {
+            const area = parseFloat(areaInput.value) || 0;
+            const count = parseInt(countInput.value) || 1;
+            const rates = { eco: 180, standard: 250, premium: 350 };
+            const rate = rates[tier];
+            const totalCost = area * count * rate;
+            const laborCost = totalCost * 0.15;
+            
+            document.getElementById('windowResult').innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h6>Window Cost Calculation</h6>
+                        <p>Area: ${area} sq ft × ${count} windows × ₹${rate}/sq ft = ₹${totalCost.toLocaleString()}</p>
+                        <p>Labor Cost (15%): ₹${laborCost.toLocaleString()}</p>
+                        <p><strong>Total Cost: ₹${(totalCost + laborCost).toLocaleString()}</strong></p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        lengthInput.addEventListener('input', calculateWindowArea);
+        widthInput.addEventListener('input', calculateWindowArea);
+        typeSelect.addEventListener('change', () => {
+            const length = parseFloat(lengthInput.value) || 0;
+            const width = parseFloat(widthInput.value) || 0;
+            checkWindowConstraints(length, width);
+        });
+        
+        ecoBtn.addEventListener('click', () => calculateWindowCost('eco'));
+        standardBtn.addEventListener('click', () => calculateWindowCost('standard'));
+        premiumBtn.addEventListener('click', () => calculateWindowCost('premium'));
+    }
+    
+    // Doors Calculator Functions
+    function initDoorsCalculator() {
+        const coreSelect = document.getElementById('doorCore');
+        const finishSelect = document.getElementById('doorFinish');
+        const hardwareSelect = document.getElementById('doorHardware');
+        const ecoHandle = document.getElementById('handleEco');
+        const standardHandle = document.getElementById('handleStandard');
+        const premiumHandle = document.getElementById('handlePremium');
+        
+        function updateDoorOptions() {
+            const core = coreSelect.value;
+            const warningDiv = document.getElementById('doorWarning');
+            
+            if (core === 'Glass Door') {
+                finishSelect.disabled = true;
+                finishSelect.value = '';
+                hardwareSelect.innerHTML = '<option value="Floor Machine">Floor Machine</option>';
+                hardwareSelect.value = 'Floor Machine';
+                warningDiv.innerHTML = 'Glass doors require Floor Machine hardware and no finish';
+                warningDiv.style.display = 'block';
+            } else if (['Plywood', 'BWP', 'MDHMR', 'Solid Wood'].includes(core)) {
+                finishSelect.disabled = false;
+                hardwareSelect.innerHTML = `
+                    <option value="">Select Hardware</option>
+                    <option value="Hinges">Hinges</option>
+                    <option value="Floor Machine">Floor Machine</option>
+                `;
+                warningDiv.style.display = 'none';
+            } else {
+                finishSelect.disabled = false;
+                hardwareSelect.innerHTML = `
+                    <option value="">Select Hardware</option>
+                    <option value="Hinges">Hinges</option>
+                `;
+                warningDiv.style.display = 'none';
+            }
+        }
+        
+        function calculateDoorCost(handleTier) {
+            const width = parseFloat(document.getElementById('doorWidth').value) || 0;
+            const height = parseFloat(document.getElementById('doorHeight').value) || 0;
+            const core = coreSelect.value;
+            const finish = finishSelect.value;
+            
+            if (!core || width === 0 || height === 0) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            const coreRates = {
+                'Plywood': 5000,
+                'BWP': 6000,
+                'MDHMR': 4500,
+                'Solid Wood': 12000,
+                'Aluminium Frame': 8000,
+                'Glass Door': 15000
+            };
+            
+            const finishRates = {
+                'Laminate': 2000,
+                'MDF with Paint': 1500,
+                'Veneer with Paint': 3000,
+                'PVC': 2500,
+                'Highlighters': 1000
+            };
+            
+            const handleRates = { eco: 500, standard: 2000, premium: 10000 };
+            
+            const coreRate = coreRates[core] || 0;
+            const finishRate = core === 'Glass Door' ? 0 : (finishRates[finish] || 0);
+            const handleRate = handleRates[handleTier] || 0;
+            
+            const materialCost = coreRate + finishRate;
+            const laborCost = materialCost * 0.35;
+            const totalCost = materialCost + laborCost + handleRate;
+            
+            document.getElementById('doorResult').innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h6>Door Cost Calculation</h6>
+                        <p>Core (${core}): ₹${coreRate.toLocaleString()}</p>
+                        ${finish ? `<p>Finish (${finish}): ₹${finishRate.toLocaleString()}</p>` : ''}
+                        <p>Handle (${handleTier}): ₹${handleRate.toLocaleString()}</p>
+                        <p>Labor Cost (35% of Core+Finish): ₹${laborCost.toLocaleString()}</p>
+                        <p><strong>Total Cost: ₹${totalCost.toLocaleString()}</strong></p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        coreSelect.addEventListener('change', updateDoorOptions);
+        
+        ecoHandle.addEventListener('click', () => calculateDoorCost('eco'));
+        standardHandle.addEventListener('click', () => calculateDoorCost('standard'));
+        premiumHandle.addEventListener('click', () => calculateDoorCost('premium'));
     }
 });
 </script>
