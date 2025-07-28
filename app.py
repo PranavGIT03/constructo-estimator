@@ -51,7 +51,7 @@ class Estimation(db.Model):
     utility_rooms = db.Column(db.Integer)
     car_parking = db.Column(db.Integer)
     two_wheeler_parking = db.Column(db.Integer)
-    lift = db.Column(db.Boolean, default=False)
+    lift = db.Column(db.Integer, default=0)
     total_cost = db.Column(db.Float)
     details = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -161,7 +161,7 @@ def create_estimate():
     utility_rooms = data.get('utility_rooms', 0)
     car_parking = data.get('car_parking', 0)
     two_wheeler_parking = data.get('two_wheeler_parking', 0)
-    lift = data.get('lift', False)
+    lift = data.get('lift', 0)
     
     # Calculate costs for each category
     categories = ['Civil Work', 'Electrical', 'Plumbing', 'Sanitation', 'Steel Roofing', 
