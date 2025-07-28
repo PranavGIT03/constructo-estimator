@@ -528,25 +528,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 const price = parseFloat(this.getAttribute('data-price'));
                 const tier = this.getAttribute('data-tier');
                 
-                // Update selected materials
-                selectedMaterials[category] = {
-                    id: materialId,
-                    name: name,
-                    brand: brand,
-                    price: price,
-                    tier: tier
-                };
-                
-                // Update button states
-                document.querySelectorAll(`[data-category="${category}"] .select-material`).forEach(btn => {
-                    btn.classList.remove('btn-success');
-                    btn.classList.add('btn-primary');
-                    btn.textContent = 'Select';
-                });
-                
-                this.classList.remove('btn-primary');
-                this.classList.add('btn-success');
-                this.textContent = 'Selected';
+                // Check if this material is already selected
+                if (this.classList.contains('btn-success')) {
+                    // Unselect the material
+                    delete selectedMaterials[category];
+                    this.classList.remove('btn-success');
+                    this.classList.add('btn-primary');
+                    this.textContent = 'Select';
+                } else {
+                    // Select the material
+                    selectedMaterials[category] = {
+                        id: materialId,
+                        name: name,
+                        brand: brand,
+                        price: price,
+                        tier: tier
+                    };
+                    
+                    // Update button states for this category
+                    document.querySelectorAll(`[data-category="${category}"] .select-material`).forEach(btn => {
+                        btn.classList.remove('btn-success');
+                        btn.classList.add('btn-primary');
+                        btn.textContent = 'Select';
+                    });
+                    
+                    this.classList.remove('btn-primary');
+                    this.classList.add('btn-success');
+                    this.textContent = 'Selected';
+                }
                 
                 // Update estimate
                 updateEstimate();
