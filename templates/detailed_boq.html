@@ -459,6 +459,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         materials.forEach(material => {
             const laborCost = material.price * (material.labor_cost_percentage / 100);
+            const selectionKey = `${material.category}-${material.subcategory || 'default'}`;
+            const isSelected = selectedMaterials[selectionKey] && selectedMaterials[selectionKey].id == material.id;
             
             html += `
                 <tr data-material-id="${material.id}">
@@ -468,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${material.price.toLocaleString('en-IN')}</td>
                     ${isPremium ? `<td>${laborCost.toLocaleString('en-IN')}</td>` : ''}
                     <td>
-                        <button class="btn btn-sm btn-primary select-material" 
+                        <button class="btn btn-sm ${isSelected ? 'btn-success' : 'btn-primary'} select-material" 
                                 data-material-id="${material.id}" 
                                 data-category="${material.category}"
                                 data-subcategory="${material.subcategory || ''}"
@@ -476,7 +478,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 data-brand="${material.brand || ''}"
                                 data-price="${material.price}"
                                 data-tier="${material.tier}">
-                            Select
+                            ${isSelected ? 'Selected' : 'Select'}
                         </button>
                     </td>
                     ${isPremium ? `
