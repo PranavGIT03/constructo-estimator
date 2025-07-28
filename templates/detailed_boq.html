@@ -552,22 +552,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     };
                     
                     // Update button states for this subcategory (deselect all others)
-                    document.querySelectorAll(`[data-category="${category}"][data-subcategory="${subcategory}"] .select-material`).forEach(btn => {
-                        btn.classList.remove('btn-success');
-                        btn.classList.add('btn-primary');
-                        btn.textContent = 'Select';
+                    const subcategoryValue = this.getAttribute('data-subcategory') || '';
+                    document.querySelectorAll('.select-material').forEach(btn => {
+                        const btnCategory = btn.getAttribute('data-category');
+                        const btnSubcategory = btn.getAttribute('data-subcategory') || '';
+                        
+                        if (btnCategory === category && btnSubcategory === subcategoryValue) {
+                            btn.classList.remove('btn-success');
+                            btn.classList.add('btn-primary');
+                            btn.textContent = 'Select';
+                        }
                     });
-                    
-                    // If no subcategory attribute, fall back to category-wide deselection
-                    if (!this.getAttribute('data-subcategory')) {
-                        document.querySelectorAll(`[data-category="${category}"] .select-material`).forEach(btn => {
-                            if (!btn.getAttribute('data-subcategory')) {
-                                btn.classList.remove('btn-success');
-                                btn.classList.add('btn-primary');
-                                btn.textContent = 'Select';
-                            }
-                        });
-                    }
                     
                     this.classList.remove('btn-primary');
                     this.classList.add('btn-success');
