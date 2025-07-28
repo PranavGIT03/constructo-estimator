@@ -297,8 +297,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update current tier
             currentTier = this.getAttribute('data-tier');
             
-            // Load materials for the selected tier
-            loadMaterials(currentCategory, currentTier, currentSubcategory);
+            // Only load materials if not Windows or Doors
+            if (currentCategory !== 'Windows' && currentCategory !== 'Doors') {
+                loadMaterials(currentCategory, currentTier, currentSubcategory);
+            }
         });
     });
     
@@ -347,6 +349,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function loadSubcategories(category) {
         try {
+            // Don't load subcategories for Windows and Doors
+            if (category === 'Windows' || category === 'Doors') {
+                document.getElementById('subcategoryFilter').innerHTML = '';
+                return;
+            }
+            
             const response = await fetch(`/api/subcategories?category=${encodeURIComponent(category)}`);
             const subcategories = await response.json();
             
