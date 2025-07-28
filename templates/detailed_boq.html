@@ -234,7 +234,8 @@ document.addEventListener('DOMContentLoaded', function() {
         loadEstimateData(estimateId);
     }
     
-    // Load materials for the initial category
+    // Load materials for the initial category with MS Box as default
+    currentSubcategory = 'MS Box';
     loadMaterials(currentCategory, currentTier, currentSubcategory);
     
     // Function to load estimate data
@@ -393,16 +394,18 @@ document.addEventListener('DOMContentLoaded', function() {
             let html = `
                 <label>Filter by Subcategory:</label>
                 <div class="btn-group mb-3" role="group">
-                    <button type="button" class="btn btn-sm btn-outline-secondary active" data-subcategory="">All</button>
             `;
             
             subcategories.forEach(subcategory => {
+                const isActive = subcategory === 'MS Box' ? 'active' : '';
                 html += `
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-subcategory="${subcategory}">${subcategory}</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary ${isActive}" data-subcategory="${subcategory}">${subcategory}</button>
                 `;
             });
             
-            html += `</div>`;
+            html += `
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-subcategory="">All</button>
+                </div>`;
             
             container.innerHTML = html;
             
@@ -417,6 +420,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Update current subcategory
                     currentSubcategory = this.getAttribute('data-subcategory');
+                    
+                    // If switching to All, reset currentSubcategory to empty
+                    if (currentSubcategory === '') {
+                        currentSubcategory = '';
+                    }
                     
                     // Load materials for the selected subcategory
                     loadMaterials(currentCategory, currentTier, currentSubcategory);
