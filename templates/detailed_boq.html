@@ -156,11 +156,12 @@
                         </div>
                         <div class="col-md-4">
                             <label>Handle Type</label>
-                            <div class="btn-group d-block" role="group">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" id="handleEco">Eco+ (₹500)</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" id="handleStandard">Standard (₹2000)</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" id="handlePremium">Premium (₹10000)</button>
-                            </div>
+                            <select id="doorHandle" class="form-select">
+                                <option value="">Select Handle</option>
+                                <option value="eco">Eco+ (₹500)</option>
+                                <option value="standard">Standard (₹2000)</option>
+                                <option value="premium">Premium (₹10000)</option>
+                            </select>
                         </div>
                     </div>
                     <div id="doorWarning" class="alert alert-warning mt-3" style="display: none;"></div>
@@ -564,9 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const coreSelect = document.getElementById('doorCore');
         const finishSelect = document.getElementById('doorFinish');
         const hardwareSelect = document.getElementById('doorHardware');
-        const ecoHandle = document.getElementById('handleEco');
-        const standardHandle = document.getElementById('handleStandard');
-        const premiumHandle = document.getElementById('handlePremium');
+        const handleSelect = document.getElementById('doorHandle');
         
         function updateDoorOptions() {
             const core = coreSelect.value;
@@ -597,13 +596,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        function calculateDoorCost(handleTier) {
+        function calculateDoorCost() {
             const width = parseFloat(document.getElementById('doorWidth').value) || 0;
             const height = parseFloat(document.getElementById('doorHeight').value) || 0;
             const core = coreSelect.value;
             const finish = finishSelect.value;
+            const handleTier = handleSelect.value;
             
-            if (!core || width === 0 || height === 0) {
+            if (!core || width === 0 || height === 0 || !handleTier) {
                 alert('Please fill all required fields');
                 return;
             }
@@ -650,10 +650,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         coreSelect.addEventListener('change', updateDoorOptions);
-        
-        ecoHandle.addEventListener('click', () => calculateDoorCost('eco'));
-        standardHandle.addEventListener('click', () => calculateDoorCost('standard'));
-        premiumHandle.addEventListener('click', () => calculateDoorCost('premium'));
+        handleSelect.addEventListener('change', calculateDoorCost);
     }
 });
 </script>
