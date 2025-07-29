@@ -318,6 +318,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Load materials for the selected category
                 loadMaterials(currentCategory, currentTier, currentSubcategory);
             }
+            
+            // Update subcategory tinting after category change
+            setTimeout(updateSubcategoryTinting, 100);
         });
     });
     
@@ -671,6 +674,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (Object.keys(selectedMaterials).length === 0) {
             estimateCard.style.display = 'none';
+            updateSubcategoryTinting();
             return;
         }
         
@@ -698,6 +702,35 @@ document.addEventListener('DOMContentLoaded', function() {
         total.textContent = `Total: ₹${totalCost.toLocaleString('en-IN')}`;
         
         updateProgress();
+        updateSubcategoryTinting();
+    }
+    
+    function updateSubcategoryTinting() {
+        // Get all subcategory buttons
+        const subcategoryButtons = document.querySelectorAll('[data-subcategory]');
+        
+        // Reset all buttons to default state
+        subcategoryButtons.forEach(button => {
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-secondary');
+        });
+        
+        // Tint buttons for subcategories with selections
+        const selectedSubcategories = new Set();
+        for (const [key, material] of Object.entries(selectedMaterials)) {
+            if (material.category === currentCategory && material.subcategory) {
+                selectedSubcategories.add(material.subcategory);
+            }
+        }
+        
+        // Apply tinting to selected subcategories
+        selectedSubcategories.forEach(subcategory => {
+            const button = document.querySelector(`[data-subcategory="${subcategory}"]`);
+            if (button) {
+                button.classList.remove('btn-outline-secondary');
+                button.classList.add('btn-success');
+            }
+        });
     }
     
     function updateProgress() {
